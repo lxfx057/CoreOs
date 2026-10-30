@@ -57,7 +57,7 @@
   async function configurePin() {
     let pin=prompt('Imposta un PIN locale di esattamente 5 cifre (non usare il PIN della carta o del telefono):');
     if(pin===null)return;
-    if(!/^\d{4,12}$/.test(pin)){alert('Il PIN deve contenere da 4 a 12 cifre.');return;}
+    if(!/^\d{5}$/.test(pin)){alert('Il PIN deve contenere esattamente 5 cifre numeriche.');return;}
     const salt=crypto.randomUUID(); localStorage.setItem(pinSaltKey,salt); localStorage.setItem(pinKey,await digest(pin,salt)); prefs.pinEnabled=true;savePrefs();notify('PIN attivato','Il blocco sessione è pronto.');
   }
 
