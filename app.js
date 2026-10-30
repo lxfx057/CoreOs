@@ -244,7 +244,7 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     </section>`;
     gate.querySelectorAll('[data-config]').forEach(el=>el.value=config[el.dataset.config]??defaults[el.dataset.config]??'');
     document.getElementById('backCreate').onclick=showCreate;
-    document.getElementById('finishCreate').onclick=()=>{
+    document.getElementById('finishCreate').onclick=async()=>{
       gate.querySelectorAll('[data-config]').forEach(el=>config[el.dataset.config]=el.value);
       config.deviceMode=document.getElementById('coreDeviceMode').value;
       config.language=document.getElementById('coreLanguage').value;
@@ -252,6 +252,9 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
       localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
       localStorage.setItem(PROFILE_KEY,JSON.stringify({...profile,createdAt:new Date().toISOString()}));
       localStorage.setItem(SESSION_KEY,'1');
+      gate.innerHTML=`<section class="gate-card install-progress"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>INSTALLAZIONE</small></div></div><h1>Installazione in corso…</h1><p class="gate-copy">Configurazione del sistema e preparazione delle applicazioni.</p><div class="gate-progress"><span id="coreInstallProgress" style="width:8%"></span></div><p id="coreInstallStatus" class="gate-note">Configurazione sistema…</p></section>`;
+      const bar=document.getElementById('coreInstallProgress'),status=document.getElementById('coreInstallStatus');
+      for(const [pct,label] of [[38,'Installazione applicazioni…'],[72,'Salvataggio impostazioni…'],[100,'Finalizzazione…']]){await new Promise(resolve=>setTimeout(resolve,1000));bar.style.width=pct+'%';status.textContent=label;}
       applyConfig();enterDesktop(profile.user,profile.name);
     };
   }
