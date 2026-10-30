@@ -115,8 +115,20 @@
         let result='';
         if(cmd==='ls') result='Desktop/  Documenti/  Immagini/  Download/  Cestino/';
         else if(cmd==='neofetch') result='   _________\\n  / ____/ ___/\\n / /   / /__  ___  ____\\n/ /___/ / _ \\/ _ \\/ __/\\n\\____/_/\\___/\\___/_/\\n\\nOS: CoreOS v6\\nMode: Local desktop\\nShell: CoreOS Terminal\\nTheme: '+(prefs.theme||'dark')+'\\nUser: '+(read(profileKey,{user:'utente'}).user||'utente');
-        else if(cmd==='admin') { const pass=prompt('Password amministratore:'); if(pass==='1234'){result='Accesso amministratore locale consentito.\\nUtente attivo: '+(read(profileKey,{user:'utente'}).user||'utente')+'\\nNota: cambia la password iniziale 1234 prima di usare CoreOS con dati importanti.';} else result='Autenticazione amministratore non riuscita.'; }
-        else if(cmd==='del/user') { const p=read(profileKey,null); if(!p){result='Nessun utente locale trovato.';} else if(confirm('Eliminare il profilo '+p.user+' e i dati CoreOS locali? Operazione irreversibile.')){['coreos.profile.v1','coreos.config.v1','coreos.session.v1','coreos.notes','coreos.v6.prefs','coreos.pinHash.v1','coreos.pinSalt.v1','coreos.localBackup.v1'].forEach(k=>localStorage.removeItem(k));result='Profilo locale eliminato. CoreOS verrà riavviato.';out.textContent+='user@coreos:~$ '+cmd+'\\n'+result+'\\n';setTimeout(()=>location.reload(),900);input.value='';return;} else result='Operazione annullata.'; }
+        else if(cmd==='admin') {
+          let salt=localStorage.getItem('coreos.admin.salt.v1'), hash=localStorage.getItem('coreos.admin.hash.v1');
+          if(!hash){
+            const first=prompt('Crea la password amministratore locale (almeno 10 caratteri):');
+            if(first===null){result='Configurazione annullata.';}
+            else if(first.length<10){result='Password troppo corta: servono almeno 10 caratteri.';}
+            else {const again=prompt('Conferma la password amministratore:');if(first!==again){result='Le password non coincidono.';}else{salt=crypto.randomUUID();hash=await digest(first,salt);localStorage.setItem('coreos.admin.salt.v1',salt);localStorage.setItem('coreos.admin.hash.v1',hash);result='Password amministratore configurata. Accesso consentito.';}}
+          } else {
+            const pass=prompt('Password amministratore:');
+            if(pass!==null && await digest(pass,salt)===hash) result='Accesso amministratore locale consentito.\\nUtente attivo: '+(read(profileKey,{user:'utente'}).user||'utente');
+            else result='Autenticazione amministratore non riuscita.';
+          }
+        }
+        else if(cmd==='del/user') { const p=read(profileKey,null); if(!p){result='Nessun utente locale trovato.';} else if(confirm('Eliminare il profilo '+p.user+' e i dati CoreOS locali? Operazione irreversibile.')){['coreos.profile.v1','coreos.config.v1','coreos.session.v1','coreos.notes','coreos.v6.prefs','coreos.pinHash.v1','coreos.pinSalt.v1','coreos.localBackup.v1','coreos.admin.salt.v1','coreos.admin.hash.v1'].forEach(k=>localStorage.removeItem(k));result='Profilo locale eliminato. CoreOS verrà riavviato.';out.textContent+='user@coreos:~$ '+cmd+'\\n'+result+'\\n';setTimeout(()=>location.reload(),900);input.value='';return;} else result='Operazione annullata.'; }
         else if(cmd==='shutdown') { result='Arresto di CoreOS…'; document.querySelector('.desktop')?.classList.add('core-hidden-desktop'); setTimeout(()=>{const s=$('#shutdownScreen');if(s){s.hidden=false;s.innerHTML='<div><div class="gate-mark">C</div><h1>CoreOS è spento.</h1><p>I dati locali sono stati conservati.</p><button class="gate-btn primary" onclick="location.reload()">Riaccendi CoreOS</button></div>';}},350); }
         else if(cmd==='exit') { result='Terminale chiuso.'; out.textContent+='user@coreos:~$ exit\\n'+result+'\\n'; if(typeof closeApp==='function')closeApp(); return; }
         else result='Comando non riconosciuto. I soli comandi disponibili sono: ls, admin, neofetch, del/user, shutdown, exit.';
@@ -126,7 +138,7 @@
   }
   function addStore() {
     if(typeof apps==='undefined' || apps.store)return;
-    apps.store={title:'CoreOS Store',html:'<h3>CoreOS Store</h3><p>Catalogo locale delle applicazioni disponibili in questa versione.</p><div class="core-store-grid"><article><b>File Manager</b><span>Gestione dei file autorizzati</span><button data-store-app="files">Apri</button></article><article><b>Terminale</b><span>Comandi locali CoreOS</span><button data-store-app="terminal">Apri</button></article><article><b>Blocco note</b><span>Documenti locali</span><button data-store-app="notes">Apri</button></article><article><b>Calcolatrice</b><span>Calcoli rapidi</span><button data-store-app="calculator">Apri</button></article><article><b>Calendario</b><span>Calendario sul dispositivo</span><button data-store-app="calendar">Apri</button></article></div><p class="core-muted">Le app sono componenti integrate: lo Store non installa software arbitrario.</p>'};
+    apps.store={title:'CoreOS Store',html:'<h3>CoreOS Store</h3><p>Catalogo locale delle applicazioni disponibili in questa versione.</p><div class="core-store-grid"><article><b>File Manager</b><span>Gestione dei file autorizzati</span><button data-store-app="files">Apri</button></article><article><b>Terminale</b><span>Comandi locali CoreOS</span><button data-store-app="terminal">Apri</button></article><article><b>Blocco note</b><span>Documenti locali</span><button data-store-app="notes">Apri</button></article><article><b>Calcolatrice</b><span>Calcoli rapidi</span><button data-store-app="calculator">Apri</button></article><article><b>Calendario</b><span>Eventi e promemoria locali</span><button data-store-app="calendar">Apri</button></article><article><b>Browser</b><span>Navigazione web con apertura esterna</span><button data-store-app="browser">Apri</button></article><article><b>Paint</b><span>Disegno ed esportazione PNG</span><button data-store-app="paint">Apri</button></article><article><b>Media Player</b><span>Riproduzione di file locali</span><button data-store-app="media">Apri</button></article><article><b>Meteo</b><span>Previsioni online</span><button data-store-app="weather">Apri</button></article></div><p class="core-muted">Le app sono componenti integrate: lo Store non installa software arbitrario.</p>'};
     document.addEventListener('click',e=>{const b=e.target.closest('[data-store-app]');if(b&&typeof window.openApp==='function')window.openApp(b.dataset.storeApp);});
     document.querySelectorAll('.launcher-app').forEach(()=>{});
     const grid=$('#launcherApps'); if(grid&&!grid.querySelector('[data-open="store"]')){const b=document.createElement('button');b.className='launcher-app';b.dataset.open='store';b.dataset.label='CoreOS Store';b.innerHTML='<span class="launcher-icon store">⬇</span><span>CoreOS Store</span>';grid.append(b);b.onclick=()=>{if(typeof window.openApp==='function')window.openApp('store');$('#cosmicLauncher').hidden=true;};}
@@ -136,7 +148,7 @@
     const panel=document.createElement('div');panel.id='coreDevicePanel';panel.className='core-device-panel';
     panel.innerHTML='<b>Dispositivo</b><p id="coreNetworkState">Rete: verifica…</p><label>Volume dei contenuti multimediali <input id="coreMediaVolume" type="range" min="0" max="100" value="100"></label><small>Il volume controlla solo i contenuti audio/video riprodotti da CoreOS, non il volume generale del telefono o computer.</small>';
     document.body.append(panel);
-    $('#quickSettings')?.addEventListener('click',()=>panel.classList.toggle('visible'));
+    if($('#quickSettings')) $('#quickSettings').onclick=()=>panel.classList.toggle('visible');
     const update=()=>{$('#coreNetworkState').textContent='Rete: '+(navigator.onLine?'connesso (stato browser)':'offline');};
     update();window.addEventListener('online',update);window.addEventListener('offline',update);
     $('#coreMediaVolume').oninput=e=>{document.querySelectorAll('audio,video').forEach(m=>m.volume=Number(e.target.value)/100);};
