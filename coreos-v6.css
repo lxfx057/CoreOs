@@ -20,3 +20,64 @@
 :root[data-core-mode="mobile"] .desktop{min-height:100dvh}:root[data-core-mode="mobile"] .desktop-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}:root[data-core-mode="mobile"] .dock{left:10px;right:10px;bottom:10px;transform:none;justify-content:space-around}:root[data-core-mode="mobile"] .app-window{width:calc(100vw - 16px)!important;height:calc(100dvh - 100px)!important;left:8px!important;top:8px!important;transform:none!important}
 :root[data-core-mode="desktop"] .app-window{resize:both;overflow:auto;min-width:min(320px,calc(100vw - 20px));min-height:220px}
 @media(max-width:700px){.core-app-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Setup wizard: consistent sizing, spacing and responsive safe-area layout */
+#accountGate.account-gate{box-sizing:border-box;min-height:100dvh;padding:clamp(12px,3vw,32px);overflow-x:hidden;overflow-y:auto;align-items:center;justify-items:center}
+#accountGate.account-gate *{box-sizing:border-box}
+#accountGate .gate-card{width:min(100%,760px);max-width:760px;max-height:calc(100dvh - 2 * clamp(12px,3vw,32px));overflow-y:auto;overscroll-behavior:contain;margin:auto;padding:clamp(18px,3.2vw,34px);border-radius:22px;gap:0}
+#accountGate .gate-brand{margin-bottom:clamp(14px,2vw,22px)}
+#accountGate .gate-card h1{font-size:clamp(23px,3.4vw,34px);line-height:1.12;margin:8px 0 10px}
+#accountGate .gate-copy{font-size:clamp(13px,1.5vw,15px);line-height:1.55;margin:0 0 16px;max-width:68ch}
+#accountGate .gate-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#accountGate .gate-field{min-width:0}
+#accountGate .gate-field.full{grid-column:1/-1}
+#accountGate input,#accountGate select{width:100%;min-width:0;max-width:100%;min-height:44px}
+#accountGate .setup-wizard{width:min(100%,820px)}
+#accountGate .setup-step-track{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:16px 0 8px}
+#accountGate .setup-step-track span{height:5px;border-radius:99px;background:rgba(140,160,190,.2);transition:background .35s ease,transform .35s ease}
+#accountGate .setup-step-track span.active{background:var(--blue,#168df0);transform:scaleY(1.25)}
+#accountGate .setup-step-count{font-size:12px;color:var(--core-muted);margin-bottom:12px}
+#accountGate .setup-options{display:block;max-height:min(48dvh,460px);overflow:auto;padding:0 4px 4px 0;overscroll-behavior:contain}
+#accountGate .setup-options .option-group{width:100%;min-width:0;margin:0;padding:clamp(12px,2vw,18px);border-radius:14px}
+#accountGate .setup-options .option-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,44%);align-items:center;gap:12px;padding:8px 0}
+#accountGate .setup-options .option-row label{min-width:0;line-height:1.35}
+#accountGate .setup-options .option-row select{min-height:40px}
+#accountGate .core-app-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#accountGate .core-app-choice-grid label{min-width:0;overflow-wrap:anywhere;padding:10px}
+#accountGate .gate-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:12px}
+#accountGate .gate-actions button{min-width:132px;min-height:44px}
+#accountGate .gate-error{min-height:0;margin-top:8px}
+#accountGate .gate-progress{width:100%;overflow:hidden}
+#accountGate .gate-progress span{display:block;transition:width .55s cubic-bezier(.2,.75,.25,1)}
+/* Persistent, restrained CoreOS motion */
+@keyframes coreGateEnter{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes coreGlowPulse{0%,100%{box-shadow:0 0 0 rgba(35,145,255,0)}50%{box-shadow:0 0 22px rgba(35,145,255,.12)}}
+@keyframes coreButtonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+#accountGate .gate-card{animation:coreGateEnter .42s cubic-bezier(.2,.75,.25,1) both}
+#accountGate .gate-mark{animation:coreGlowPulse 3.8s ease-in-out infinite}
+#accountGate .gate-btn.primary{transition:transform .22s ease,filter .22s ease,box-shadow .22s ease}
+#accountGate .gate-btn.primary:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 8px 22px rgba(20,130,240,.22)}
+#accountGate .gate-btn:active{transform:scale(.98)}
+#accountGate .option-row select,#accountGate input{transition:border-color .2s ease,box-shadow .2s ease}
+#accountGate input:focus,#accountGate select:focus{outline:none;border-color:var(--blue,#168df0);box-shadow:0 0 0 3px rgba(30,145,255,.16)}
+@media(max-width:700px){
+ #accountGate.account-gate{padding:10px;align-items:start}
+ #accountGate .gate-card{width:100%;max-width:560px;max-height:calc(100dvh - 20px);padding:18px 15px;border-radius:18px}
+ #accountGate .gate-form{grid-template-columns:minmax(0,1fr);gap:10px}
+ #accountGate .gate-field.full{grid-column:auto}
+ #accountGate .setup-options{max-height:42dvh}
+ #accountGate .setup-options .option-row{grid-template-columns:minmax(0,1fr);gap:6px}
+ #accountGate .setup-options .option-row select{width:100%}
+ #accountGate .core-app-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #accountGate .gate-actions{display:grid;grid-template-columns:1fr 1fr}
+ #accountGate .gate-actions button{min-width:0;width:100%}
+}
+@media(max-height:620px){
+ #accountGate.account-gate{align-items:start}
+ #accountGate .gate-card{max-height:none}
+ #accountGate .setup-options{max-height:36dvh}
+}
+@media(prefers-reduced-motion:reduce){
+ #accountGate .gate-card,#accountGate .gate-mark{animation:none!important}
+ #accountGate *{scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
