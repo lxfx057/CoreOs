@@ -233,6 +233,12 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     gate.innerHTML=`<section class="gate-card"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS BUILDER</strong><small>PERSONALIZZA IL TUO SISTEMA</small></div></div>
       <div class="gate-eyebrow">PASSAGGIO 2 DI 2 · ${allOptions.length} OPZIONI</div><h1>Costruiamo il tuo OS.</h1><p class="gate-copy">Scegli le impostazioni iniziali. Potrai modificarle in seguito dal pannello Impostazioni.</p><div class="gate-progress"><span style="width:100%"></span></div>
       <div class="option-groups">${groups}<div class="option-group"><h3>Altre opzioni</h3>${extra}</div></div>
+      <div class="option-group"><h3>Dispositivo e applicazioni</h3>
+        <div class="option-row"><label for="coreDeviceMode">Modalità</label><select id="coreDeviceMode"><option value="desktop">Desktop orizzontale</option><option value="mobile">Mobile verticale</option></select></div>
+        <div class="option-row"><label for="coreLanguage">Lingua interfaccia</label><select id="coreLanguage"><option value="it">Italiano</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></div>
+        <p class="core-muted">Seleziona le applicazioni da mostrare nel launcher. Puoi cambiarle in seguito.</p>
+        <div class="core-app-choice-grid">${[['files','File Manager'],['browser','Browser'],['terminal','Terminale'],['calculator','Calcolatrice'],['calendar','Calendario'],['notes','Notepad'],['paint','Paint'],['media','Media Player'],['weather','Meteo']].map(([id,label])=>`<label><input type="checkbox" data-core-app="${id}" checked> ${label}</label>`).join('')}</div>
+      </div>
       <div class="gate-note">La password non viene caricata su un server: in questa anteprima il profilo è salvato solo nel browser/dispositivo in cui lo crei. Non cancellare i dati del browser se vuoi conservarlo.</div>
       <div class="gate-actions"><button class="gate-btn ghost" id="backCreate">Indietro</button><button class="gate-btn primary" id="finishCreate">Crea il mio sistema CoreOS</button></div>
     </section>`;
@@ -240,6 +246,9 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     document.getElementById('backCreate').onclick=showCreate;
     document.getElementById('finishCreate').onclick=()=>{
       gate.querySelectorAll('[data-config]').forEach(el=>config[el.dataset.config]=el.value);
+      config.deviceMode=document.getElementById('coreDeviceMode').value;
+      config.language=document.getElementById('coreLanguage').value;
+      config.installedApps=[...gate.querySelectorAll('[data-core-app]:checked')].map(el=>el.dataset.coreApp);
       localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
       localStorage.setItem(PROFILE_KEY,JSON.stringify({...profile,createdAt:new Date().toISOString()}));
       localStorage.setItem(SESSION_KEY,'1');
@@ -336,6 +345,8 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     root.dataset.coreDockSize=config.dockSize;
     root.dataset.coreWindowStyle=config.windowStyle;
     root.dataset.coreShadows=config.shadows;
+    root.dataset.coreMode=config.deviceMode||'desktop';
+    document.querySelectorAll('.launcher-app[data-open],.desktop-shortcut[data-open],.dock-app[data-open]').forEach(el=>{const id=el.dataset.open;const chosen=config.installedApps||['files','browser','terminal','calculator','calendar','notes','paint','media','weather'];el.hidden=!['apps','settings','monitor','about','store'].includes(id)&&!chosen.includes(id);});
     if(config.statusBar==='off')document.querySelector('.topbar')?.classList.add('core-hidden');
     else document.querySelector('.topbar')?.classList.remove('core-hidden');
     if(config.animations==='off'||config.reducedMotion==='on')root.classList.add('core-reduced-motion');
@@ -402,6 +413,9 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     const category=b.dataset.category;
     appButtons.forEach((x,i)=>{x.hidden=category==='all'?false:category==='office'?!['COSMIC Text Editor','Thunderbird'].includes(x.dataset.label):category==='system'?!['COSMIC Settings','COSMIC Terminal','Input Method Selector','nheko'].includes(x.dataset.label):category==='utilities'?!['COSMIC Files','COSMIC Media Player','Firefox','Rhythmbox'].includes(x.dataset.label):false;});
   }));
+  // Apply the chosen desktop/mobile workspace orientation.
+  const applyDeviceMode=()=>{document.documentElement.dataset.coreMode=(JSON.parse(localStorage.getItem('coreos.config.v1')||'{}').deviceMode||'desktop');};
+  applyDeviceMode();
   // Show the applications grid as the first desktop view, like the supplied reference.
   const observer=new MutationObserver(()=>{if(document.querySelector('.desktop')?.style.display!=='none' && !sessionStorage.getItem('coreosLauncherShown')){launcher.hidden=false;sessionStorage.setItem('coreosLauncherShown','1');}});
   const gate=document.getElementById('accountGate');
