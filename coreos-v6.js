@@ -125,8 +125,8 @@
     };
   }
   function addStore() {
-    if(!window.apps || window.apps.store)return;
-    window.apps.store={title:'CoreOS Store',html:'<h3>CoreOS Store</h3><p>Catalogo locale delle applicazioni disponibili in questa versione.</p><div class="core-store-grid"><article><b>File Manager</b><span>Gestione dei file autorizzati</span><button data-store-app="files">Apri</button></article><article><b>Terminale</b><span>Comandi locali CoreOS</span><button data-store-app="terminal">Apri</button></article><article><b>Blocco note</b><span>Documenti locali</span><button data-store-app="notes">Apri</button></article><article><b>Calcolatrice</b><span>Calcoli rapidi</span><button data-store-app="calculator">Apri</button></article><article><b>Calendario</b><span>Calendario sul dispositivo</span><button data-store-app="calendar">Apri</button></article></div><p class="core-muted">Le app sono componenti integrate: lo Store non installa software arbitrario.</p>'};
+    if(typeof apps==='undefined' || apps.store)return;
+    apps.store={title:'CoreOS Store',html:'<h3>CoreOS Store</h3><p>Catalogo locale delle applicazioni disponibili in questa versione.</p><div class="core-store-grid"><article><b>File Manager</b><span>Gestione dei file autorizzati</span><button data-store-app="files">Apri</button></article><article><b>Terminale</b><span>Comandi locali CoreOS</span><button data-store-app="terminal">Apri</button></article><article><b>Blocco note</b><span>Documenti locali</span><button data-store-app="notes">Apri</button></article><article><b>Calcolatrice</b><span>Calcoli rapidi</span><button data-store-app="calculator">Apri</button></article><article><b>Calendario</b><span>Calendario sul dispositivo</span><button data-store-app="calendar">Apri</button></article></div><p class="core-muted">Le app sono componenti integrate: lo Store non installa software arbitrario.</p>'};
     document.addEventListener('click',e=>{const b=e.target.closest('[data-store-app]');if(b&&typeof window.openApp==='function')window.openApp(b.dataset.storeApp);});
     document.querySelectorAll('.launcher-app').forEach(()=>{});
     const grid=$('#launcherApps'); if(grid&&!grid.querySelector('[data-open="store"]')){const b=document.createElement('button');b.className='launcher-app';b.dataset.open='store';b.dataset.label='CoreOS Store';b.innerHTML='<span class="launcher-icon store">⬇</span><span>CoreOS Store</span>';grid.append(b);b.onclick=()=>{if(typeof window.openApp==='function')window.openApp('store');$('#cosmicLauncher').hidden=true;};}
@@ -136,6 +136,7 @@
     const panel=document.createElement('div');panel.id='coreDevicePanel';panel.className='core-device-panel';
     panel.innerHTML='<b>Dispositivo</b><p id="coreNetworkState">Rete: verifica…</p><label>Volume dei contenuti multimediali <input id="coreMediaVolume" type="range" min="0" max="100" value="100"></label><small>Il volume controlla solo i contenuti audio/video riprodotti da CoreOS, non il volume generale del telefono o computer.</small>';
     document.body.append(panel);
+    $('#quickSettings')?.addEventListener('click',()=>panel.classList.toggle('visible'));
     const update=()=>{$('#coreNetworkState').textContent='Rete: '+(navigator.onLine?'connesso (stato browser)':'offline');};
     update();window.addEventListener('online',update);window.addEventListener('offline',update);
     $('#coreMediaVolume').oninput=e=>{document.querySelectorAll('audio,video').forEach(m=>m.volume=Number(e.target.value)/100);};
