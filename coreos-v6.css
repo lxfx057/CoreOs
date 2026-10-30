@@ -15,3 +15,8 @@
 
 /* The quick settings button toggles this state. */
 .core-device-panel.visible{display:block}
+
+.core-app-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}.core-app-choice-grid label{display:flex;align-items:center;gap:7px;padding:10px;border:1px solid var(--core-border);border-radius:10px;background:var(--core-surface-2);font-size:12px}.core-app-choice-grid input{accent-color:var(--blue)}
+:root[data-core-mode="mobile"] .desktop{min-height:100dvh}:root[data-core-mode="mobile"] .desktop-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}:root[data-core-mode="mobile"] .dock{left:10px;right:10px;bottom:10px;transform:none;justify-content:space-around}:root[data-core-mode="mobile"] .app-window{width:calc(100vw - 16px)!important;height:calc(100dvh - 100px)!important;left:8px!important;top:8px!important;transform:none!important}
+:root[data-core-mode="desktop"] .app-window{resize:both;overflow:auto;min-width:min(320px,calc(100vw - 20px));min-height:220px}
+@media(max-width:700px){.core-app-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
