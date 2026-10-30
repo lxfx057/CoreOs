@@ -50,7 +50,7 @@
     document.body.append(overlay); $('#corePinInput').focus();
     $('#corePinForm').addEventListener('submit',async e=>{
       e.preventDefault(); const pin=$('#corePinInput').value;
-      if(!/^\\d{5}$/.test(pin)){ $('#corePinError').textContent='Inserisci tutte e 5 le cifre.';return; }
+      if(!/^\d{5}$/.test(pin)){ $('#corePinError').textContent='Inserisci tutte e 5 le cifre.';return; }
       const profile=read(profileKey,null);
       let valid=false;
       if(profile?.salt && profile?.hash){
@@ -77,7 +77,7 @@
     }
     let pin=prompt('Imposta un PIN locale di esattamente 5 cifre:');
     if(pin===null)return;
-    if(!/^\\d{5}$/.test(pin)){alert('Il PIN deve contenere esattamente 5 cifre numeriche.');return;}
+    if(!/^\d{5}$/.test(pin)){alert('Il PIN deve contenere esattamente 5 cifre numeriche.');return;}
     const salt=crypto.randomUUID(); localStorage.setItem(pinSaltKey,salt); localStorage.setItem(pinKey,await digest(pin,salt)); prefs.pinEnabled=true;savePrefs();notify('PIN attivato','PIN salvato su questo dispositivo.');
   }
 
