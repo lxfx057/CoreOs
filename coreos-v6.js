@@ -148,7 +148,7 @@
     const panel=document.createElement('div');panel.id='coreDevicePanel';panel.className='core-device-panel';
     panel.innerHTML='<b>Dispositivo</b><p id="coreNetworkState">Rete: verifica…</p><label>Volume dei contenuti multimediali <input id="coreMediaVolume" type="range" min="0" max="100" value="100"></label><small>Il volume controlla solo i contenuti audio/video riprodotti da CoreOS, non il volume generale del telefono o computer.</small>';
     document.body.append(panel);
-    $('#quickSettings')?.addEventListener('click',()=>panel.classList.toggle('visible'));
+    $('#quickSettings')?.addEventListener('click',e=>{e.stopImmediatePropagation();panel.classList.toggle('visible');});
     const update=()=>{$('#coreNetworkState').textContent='Rete: '+(navigator.onLine?'connesso (stato browser)':'offline');};
     update();window.addEventListener('online',update);window.addEventListener('offline',update);
     $('#coreMediaVolume').oninput=e=>{document.querySelectorAll('audio,video').forEach(m=>m.volume=Number(e.target.value)/100);};
