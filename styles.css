@@ -301,3 +301,25 @@ body{min-height:100svh;min-height:100dvh}
 @media(prefers-reduced-motion:reduce){
   .launcher-app,.dock-app{transition:none!important}
 }
+
+/* CoreOS window edge resizing: mouse, pen and touch */
+.app-window.core-resizable-window{position:absolute;box-sizing:border-box;min-width:min(260px,calc(100vw - 20px));min-height:min(180px,calc(100dvh - 20px));max-width:calc(100vw - 12px);max-height:calc(100dvh - 12px);resize:none;overflow:auto;touch-action:pan-y}
+.app-window.core-resizable-window .window-head{cursor:grab;touch-action:none;user-select:none}
+.app-window.core-resizable-window .window-head:active{cursor:grabbing}
+.core-window-resize{position:absolute;z-index:12;display:block;touch-action:none;user-select:none}
+.core-resize-n,.core-resize-s{left:12px;right:12px;height:12px;cursor:ns-resize}
+.core-resize-n{top:-5px}.core-resize-s{bottom:-5px}
+.core-resize-e,.core-resize-w{top:12px;bottom:12px;width:12px;cursor:ew-resize}
+.core-resize-e{right:-5px}.core-resize-w{left:-5px}
+.core-resize-ne,.core-resize-nw,.core-resize-se,.core-resize-sw{width:22px;height:22px}
+.core-resize-ne{right:-5px;top:-5px;cursor:nesw-resize}
+.core-resize-nw{left:-5px;top:-5px;cursor:nwse-resize}
+.core-resize-se{right:-5px;bottom:-5px;cursor:nwse-resize}
+.core-resize-sw{left:-5px;bottom:-5px;cursor:nesw-resize}
+@media(max-width:700px){
+ .app-window.core-resizable-window{width:calc(100vw - 20px);max-width:calc(100vw - 20px);max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-width:0;min-height:180px}
+ .app-window.core-resizable-window .core-window-resize{width:24px;height:24px}
+ .app-window.core-resizable-window .core-resize-e,.app-window.core-resizable-window .core-resize-w{top:20px;bottom:20px;width:18px}
+ .app-window.core-resizable-window .core-resize-n,.app-window.core-resizable-window .core-resize-s{height:18px}
+}
+@media(prefers-reduced-motion:reduce){.core-window-resize{transition:none!important}}
