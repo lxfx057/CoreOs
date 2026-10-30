@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101216">
+  <meta name="description" content="CoreOS — crea e personalizza il tuo ambiente desktop.">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <title>CoreOS — crea il tuo sistema</title>
+</head>
+<body>
+  <div id="accountGate" class="account-gate" aria-live="polite"></div>
+  <div id="shutdownScreen" class="shutdown-screen" hidden></div>
+  <div class="desktop">
+    <header class="topbar">
+      <button class="brand" id="homeBtn" aria-label="Home"><span class="brand-mark">C</span><span>coreOS <small>PRO</small></span></button>
+      <button class="start-button" id="startButton" type="button">☰ <span>Start</span></button><div class="top-center" id="topDate">Ambiente personale</div>
+      <div class="top-right"><span class="status-dot"></span><span id="clock">--:--</span><button class="icon-button" id="quickSettings" aria-label="Impostazioni rapide">☰</button></div>
+    </header>
+
+    <main class="workspace">
+      <section class="hero">
+        <div class="eyebrow">IL TUO SPAZIO DIGITALE</div>
+        <h1>Buongiorno<span class="accent">.</span></h1>
+        <p class="muted">Tutto quello che ti serve, in un unico posto.</p>
+        <div class="hero-meta"><span class="live-dot"></span> Sistema operativo web <span class="meta-sep">·</span> <span id="fullDate">Caricamento data…</span></div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel welcome-panel">
+          <div class="panel-head"><span class="eyebrow">PANORAMICA</span><span class="pill">COREOS PRO</span></div>
+          <div class="welcome-content"><div><h2>Benvenuto in CoreOS.</h2><p class="muted">Un'interfaccia semplice, ordinata e tutta tua.</p><button class="primary-button" data-open="apps">Esplora le app <span>↗</span></button></div><div class="orb"><div class="orb-inner">C</div></div></div>
+        </article>
+        <article class="panel time-panel"><span class="eyebrow">ORA LOCALE</span><div class="big-time" id="bigClock">--:--</div><div class="muted" id="timeDate">--</div><div class="time-line"></div><div class="tiny-label">IL TEMPO È TUO</div></article>
+        <article class="panel quick-panel"><div class="panel-head"><span class="eyebrow">ACCESSO RAPIDO</span><span class="muted small">7 app</span></div><div class="quick-grid">
+          <button class="app-tile" data-open="files"><span class="app-icon blue">▤</span><b>File</b><small>Gestisci i tuoi file</small></button>
+          <button class="app-tile" data-open="terminal"><span class="app-icon slate">›_</span><b>Terminale</b><small>Console demo</small></button>
+          <button class="app-tile" data-open="settings"><span class="app-icon silver">⚙</span><b>Impostazioni</b><small>Personalizza</small></button>
+          <button class="app-tile" data-open="monitor"><span class="app-icon teal">◫</span><b>Monitor</b><small>Stato sistema</small></button>
+          <button class="app-tile" data-open="notes"><span class="app-icon note-icon">▤</span><b>Blocco note</b><small>Scrivi e salva</small></button>
+          <button class="app-tile" data-open="calculator"><span class="app-icon calc-icon">＋</span><b>Calcolatrice</b><small>Calcoli rapidi</small></button>
+          <button class="app-tile" data-open="calendar"><span class="app-icon calendar-icon">▦</span><b>Calendario</b><small>Data e appuntamenti</small></button>
+        </div></article>
+        <article class="panel status-panel"><div class="panel-head"><span class="eyebrow">STATO DEL SISTEMA</span><span class="status-label"><i></i> Online</span></div><div class="status-row"><span>Interfaccia</span><b>Operativa</b></div><div class="status-row"><span>Connessione</span><b id="connection">Verifica…</b></div><div class="status-row"><span>Modalità</span><b>Browser / PWA</b></div><p class="footnote">CoreOS Pro è un ambiente web dimostrativo: non modifica il sistema operativo del dispositivo.</p></article>
+      </section>
+    </main>
+
+    <nav class="dock" aria-label="Dock applicazioni">
+      <button class="dock-app" data-open="apps" aria-label="Applicazioni"><span class="dock-symbol">▦</span></button>
+      <span class="dock-divider"></span>
+      <button class="dock-app" data-open="files" aria-label="File"><span>▤</span></button>
+      <button class="dock-app" data-open="terminal" aria-label="Terminale"><span>›_</span></button>
+      <button class="dock-app" data-open="notes" aria-label="Blocco note"><span>▤</span></button>
+      <button class="dock-app" data-open="calculator" aria-label="Calcolatrice"><span>＋</span></button>
+      <button class="dock-app" data-open="monitor" aria-label="Monitor"><span>◫</span></button>
+      <button class="dock-app" data-open="settings" aria-label="Impostazioni"><span>⚙</span></button>
+    </nav>
+  </div>
+
+  <div class="window-layer" id="windowLayer" aria-live="polite"></div>
+  <div class="custom-cursor" id="customCursor" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
