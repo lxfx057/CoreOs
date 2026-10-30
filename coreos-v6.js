@@ -46,19 +46,39 @@
   function lockScreen() {
     if ($('#coreLock')) return;
     const overlay=document.createElement('div'); overlay.id='coreLock'; overlay.className='core-lock';
-    overlay.innerHTML='<div class="core-lock-card"><div class="core-boot-mark">C</div><div class="core-lock-brand">COREOS</div><h2>Sessione bloccata</h2><p>Inserisci il PIN per tornare al desktop.</p><form id="corePinForm"><input id="corePinInput" type="password" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="off" placeholder="PIN a 5 cifre" aria-label="PIN"><button class="core-primary">Sblocca</button></form><small id="corePinError" role="alert"></small></div>';
+    overlay.innerHTML='<div class="core-lock-card"><div class="core-boot-mark">C</div><div class="core-lock-brand">COREOS</div><h2>Sessione bloccata</h2><p>Inserisci il PIN del tuo account per tornare al desktop.</p><form id="corePinForm"><input id="corePinInput" type="password" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="off" placeholder="PIN a 5 cifre" aria-label="PIN" required><button class="core-primary">Sblocca</button></form><small id="corePinError" role="alert"></small></div>';
     document.body.append(overlay); $('#corePinInput').focus();
     $('#corePinForm').addEventListener('submit',async e=>{
-      e.preventDefault(); const pin=$('#corePinInput').value; const salt=localStorage.getItem(pinSaltKey)||'';
-      if(await digest(pin,salt)===localStorage.getItem(pinKey)){overlay.remove();notify('CoreOS','Sessione sbloccata.');}
-      else $('#corePinError').textContent='PIN non corretto.';
+      e.preventDefault(); const pin=$('#corePinInput').value;
+      if(!/^\\d{5}$/.test(pin)){ $('#corePinError').textContent='Inserisci tutte e 5 le cifre.';return; }
+      const profile=read(profileKey,null);
+      let valid=false;
+      if(profile?.salt && profile?.hash){
+        const data=new TextEncoder().encode(pin);
+        const salt=Uint8Array.from(profile.salt.match(/.{1,2}/g).map(x=>parseInt(x,16)));
+        const key=await crypto.subtle.importKey('raw',data,'PBKDF2',false,['deriveBits']);
+        const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:180000,hash:'SHA-256'},key,256);
+        const hash=[...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('');
+        valid=hash===profile.hash;
+      } else {
+        const salt=localStorage.getItem(pinSaltKey)||'';
+        valid=!!localStorage.getItem(pinKey) && await digest(pin,salt)===localStorage.getItem(pinKey);
+      }
+      if(valid){overlay.remove();notify('CoreOS','Sessione sbloccata.');}
+      else $('#corePinError').textContent='PIN non corretto. Usa il PIN del tuo account CoreOS.';
     });
   }
   async function configurePin() {
-    let pin=prompt('Imposta un PIN locale di esattamente 5 cifre (non usare il PIN della carta o del telefono):');
+    const profile=read(profileKey,null);
+    if(profile?.hash && profile?.salt){
+      prefs.pinEnabled=true;savePrefs();
+      notify('PIN attivato','Il PIN del tuo account è salvato in modo sicuro su questo dispositivo e verrà usato anche per il blocco schermo.');
+      return;
+    }
+    let pin=prompt('Imposta un PIN locale di esattamente 5 cifre:');
     if(pin===null)return;
-    if(!/^\d{5}$/.test(pin)){alert('Il PIN deve contenere esattamente 5 cifre numeriche.');return;}
-    const salt=crypto.randomUUID(); localStorage.setItem(pinSaltKey,salt); localStorage.setItem(pinKey,await digest(pin,salt)); prefs.pinEnabled=true;savePrefs();notify('PIN attivato','Il blocco sessione è pronto.');
+    if(!/^\\d{5}$/.test(pin)){alert('Il PIN deve contenere esattamente 5 cifre numeriche.');return;}
+    const salt=crypto.randomUUID(); localStorage.setItem(pinSaltKey,salt); localStorage.setItem(pinKey,await digest(pin,salt)); prefs.pinEnabled=true;savePrefs();notify('PIN attivato','PIN salvato su questo dispositivo.');
   }
 
   function addSystemControls() {
