@@ -280,10 +280,9 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
   function openSystemMenu(){
     document.querySelector('.system-menu')?.remove();
     const menu=document.createElement('div');menu.className='start-menu system-menu';menu.style.left='auto';menu.style.right='12px';menu.style.bottom='72px';
-    menu.innerHTML=`<h3>Il mio CoreOS</h3><div class="start-menu-grid">
-      <button data-system="builder">Personalizza OS</button><button data-system="clone">Clona / esporta</button>
-      <button data-system="restore">Ripristina da zero</button><button data-system="logout">Esci dall’utente</button>
-      <button data-system="shutdown">Arresta sistema</button><button data-system="exit">Esci dal sito</button></div>`;
+    menu.innerHTML=`<h3>CoreOS</h3><div class="start-menu-grid">
+      <button data-system="shutdown">Spegni CoreOS</button>
+      <button data-system="exit">Esci dal sito</button></div>`;
     document.body.appendChild(menu);
     menu.querySelectorAll('[data-system]').forEach(b=>b.onclick=()=>{menu.remove();systemAction(b.dataset.system)});
     document.addEventListener('pointerdown',function closeMenu(e){if(!menu.contains(e.target)&&e.target!==document.getElementById('accountMenuButton')){menu.remove();document.removeEventListener('pointerdown',closeMenu)}},{once:true});
@@ -354,7 +353,7 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
   }
   function startMenu(){
     document.querySelector('.start-menu:not(.system-menu)')?.remove();
-    const m=document.createElement('div');m.className='start-menu';m.innerHTML=`<h3>Start · CoreOS</h3><div class="start-menu-grid"><button data-open="apps">▦ Applicazioni</button><button data-open="files">▤ File</button><button data-open="notes">✎ Blocco note</button><button data-open="calculator">＋ Calcolatrice</button><button data-open="calendar">▦ Calendario</button><button data-open="settings">⚙ Impostazioni</button><button data-system="builder">✦ Crea / modifica OS</button><button data-system="shutdown">⏻ Arresta sistema</button></div>`;
+    const m=document.createElement('div');m.className='start-menu';m.innerHTML=`<h3>Start · CoreOS</h3><div class="start-menu-grid"><button data-open="apps">▦ Applicazioni</button><button data-open="files">▤ File</button><button data-open="notes">✎ Blocco note</button><button data-open="calculator">＋ Calcolatrice</button><button data-open="calendar">▦ Calendario</button><button data-open="settings">⚙ Impostazioni</button></div>`;
     document.body.appendChild(m);
     m.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{m.remove();openApp(b.dataset.open)});
     m.querySelectorAll('[data-system]').forEach(b=>b.onclick=()=>{m.remove();systemAction(b.dataset.system)});
