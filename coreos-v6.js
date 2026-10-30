@@ -46,7 +46,7 @@
   function lockScreen() {
     if ($('#coreLock')) return;
     const overlay=document.createElement('div'); overlay.id='coreLock'; overlay.className='core-lock';
-    overlay.innerHTML='<div class="core-lock-card"><div class="core-boot-mark">C</div><div class="core-lock-brand">COREOS</div><h2>Sessione bloccata</h2><p>Inserisci il PIN per tornare al desktop.</p><form id="corePinForm"><input id="corePinInput" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN" aria-label="PIN"><button class="core-primary">Sblocca</button></form><small id="corePinError" role="alert"></small></div>';
+    overlay.innerHTML='<div class="core-lock-card"><div class="core-boot-mark">C</div><div class="core-lock-brand">COREOS</div><h2>Sessione bloccata</h2><p>Inserisci il PIN per tornare al desktop.</p><form id="corePinForm"><input id="corePinInput" type="password" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="off" placeholder="PIN a 5 cifre" aria-label="PIN"><button class="core-primary">Sblocca</button></form><small id="corePinError" role="alert"></small></div>';
     document.body.append(overlay); $('#corePinInput').focus();
     $('#corePinForm').addEventListener('submit',async e=>{
       e.preventDefault(); const pin=$('#corePinInput').value; const salt=localStorage.getItem(pinSaltKey)||'';
@@ -55,7 +55,7 @@
     });
   }
   async function configurePin() {
-    let pin=prompt('Imposta un PIN locale di almeno 4 cifre (non usare il PIN della carta o del telefono):');
+    let pin=prompt('Imposta un PIN locale di esattamente 5 cifre (non usare il PIN della carta o del telefono):');
     if(pin===null)return;
     if(!/^\d{4,12}$/.test(pin)){alert('Il PIN deve contenere da 4 a 12 cifre.');return;}
     const salt=crypto.randomUUID(); localStorage.setItem(pinSaltKey,salt); localStorage.setItem(pinKey,await digest(pin,salt)); prefs.pinEnabled=true;savePrefs();notify('PIN attivato','Il blocco sessione è pronto.');
