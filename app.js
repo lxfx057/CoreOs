@@ -200,12 +200,12 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
   }
   function showCreate(){
     gate.innerHTML=`<section class="gate-card"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>NUOVO UTENTE</small></div></div>
-      <div class="gate-eyebrow">PASSAGGIO 1 DI 2</div><h1>Crea il tuo utente.</h1><p class="gate-copy">Scegli un nome utente e imposta la password. Per questa versione la password viene impostata una sola volta: non esiste una procedura di reset.</p>
+      <div class="gate-eyebrow">PASSAGGIO 1 DI 2</div><h1>Crea il tuo utente.</h1><p class="gate-copy">Scegli un nome utente e crea un PIN numerico di 5 cifre per proteggere l'accesso.</p>
       <form id="createForm" class="gate-form">
         <div class="gate-field full"><label for="newOsName">Nome del tuo sistema</label><input id="newOsName" maxlength="32" placeholder="Es. LucaOS" required></div>
         <div class="gate-field"><label for="newUser">Username</label><input id="newUser" minlength="3" maxlength="24" autocomplete="username" placeholder="Il tuo username" required></div>
-        <div class="gate-field"><label for="newPass">Password (minimo 8 caratteri)</label><input id="newPass" type="password" minlength="8" autocomplete="new-password" required></div>
-        <div class="gate-field full"><label for="newPass2">Conferma password</label><input id="newPass2" type="password" minlength="8" autocomplete="new-password" required></div>
+        <div class="gate-field"><label for="newPass">PIN (5 cifre numeriche)</label><input id="newPass" type="password" inputmode="numeric" pattern="[0-9]{5}" minlength="5" maxlength="5" autocomplete="new-password" required></div>
+        <div class="gate-field full"><label for="newPass2">Conferma PIN</label><input id="newPass2" type="password" inputmode="numeric" pattern="[0-9]{5}" minlength="5" maxlength="5" autocomplete="new-password" required></div>
       </form><div class="gate-error" id="createError"></div>
       <div class="gate-actions"><button class="gate-btn ghost" id="backWelcome">Indietro</button><button class="gate-btn primary" id="nextOptions">Continua alle opzioni →</button></div>
     </section>`;
@@ -213,7 +213,7 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     document.getElementById('nextOptions').onclick=async()=>{
       const name=document.getElementById('newOsName').value.trim(), user=document.getElementById('newUser').value.trim(), p=document.getElementById('newPass').value, p2=document.getElementById('newPass2').value;
       const err=document.getElementById('createError');
-      if(!name||user.length<3||p.length<8||p!==p2){err.textContent='Controlla i campi: username di almeno 3 caratteri, password di almeno 8 e conferma identica.';return;}
+      if(!name||user.length<3||!/^[0-9]{5}$/.test(p)||p!==p2){err.textContent='Inserisci username di almeno 3 caratteri e un PIN di esattamente 5 cifre, confermandolo correttamente.';return;}
       if(localStorage.getItem(PROFILE_KEY)){err.textContent='Esiste già un profilo su questo browser. Esci o ripristina il sistema prima di crearne un altro.';return;}
       const hash=await hashPassword(p);
       showOptions({name,user,hash,salt:window.__coreSalt});
@@ -228,42 +228,60 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     window.__coreSalt=saltString;return hash;
   }
   function showOptions(profile){
-    const groups=optionGroups.map(([group,items])=>`<div class="option-group"><h3>${escapeHtml(group)}</h3>${items.map(optionMarkup).join('')}</div>`).join('');
-    const extra=allOptions.filter(x=>!optionGroups.some(([g,items])=>items.some(i=>i[0]===x[0]))).map(optionMarkup).join('');
-    gate.innerHTML=`<section class="gate-card"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS BUILDER</strong><small>PERSONALIZZA IL TUO SISTEMA</small></div></div>
-      <div class="gate-eyebrow">PASSAGGIO 2 DI 2 · ${allOptions.length} OPZIONI</div><h1>Costruiamo il tuo OS.</h1><p class="gate-copy">Scegli le impostazioni iniziali. Potrai modificarle in seguito dal pannello Impostazioni.</p><div class="gate-progress"><span style="width:100%"></span></div>
-      <div class="option-groups">${groups}<div class="option-group"><h3>Altre opzioni</h3>${extra}</div></div>
-      <div class="option-group"><h3>Dispositivo e applicazioni</h3>
-        <div class="option-row"><label for="coreDeviceMode">Modalità</label><select id="coreDeviceMode"><option value="desktop">Desktop orizzontale</option><option value="mobile">Mobile verticale</option></select></div>
-        <div class="option-row"><label for="coreLanguage">Lingua interfaccia</label><select id="coreLanguage"><option value="it">Italiano</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></div>
-        <p class="core-muted">Seleziona le applicazioni da mostrare nel launcher. Puoi cambiarle in seguito.</p>
-        <div class="core-app-choice-grid">${[['files','File Manager'],['browser','Browser'],['terminal','Terminale'],['calculator','Calcolatrice'],['calendar','Calendario'],['notes','Notepad'],['paint','Paint'],['media','Media Player'],['weather','Meteo']].map(([id,label])=>`<label><input type="checkbox" data-core-app="${id}" checked> ${label}</label>`).join('')}</div>
-      </div>
-      <div class="gate-note">La password non viene caricata su un server: in questa anteprima il profilo è salvato solo nel browser/dispositivo in cui lo crei. Non cancellare i dati del browser se vuoi conservarlo.</div>
-      <div class="gate-actions"><button class="gate-btn ghost" id="backCreate">Indietro</button><button class="gate-btn primary" id="finishCreate">Crea il mio sistema CoreOS</button></div>
-    </section>`;
-    gate.querySelectorAll('[data-config]').forEach(el=>el.value=config[el.dataset.config]??defaults[el.dataset.config]??'');
-    document.getElementById('backCreate').onclick=showCreate;
-    document.getElementById('finishCreate').onclick=async()=>{
-      gate.querySelectorAll('[data-config]').forEach(el=>config[el.dataset.config]=el.value);
-      config.deviceMode=document.getElementById('coreDeviceMode').value;
-      config.language=document.getElementById('coreLanguage').value;
-      config.installedApps=[...gate.querySelectorAll('[data-core-app]:checked')].map(el=>el.dataset.coreApp);
-      localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
-      localStorage.setItem(PROFILE_KEY,JSON.stringify({...profile,createdAt:new Date().toISOString()}));
-      localStorage.setItem(SESSION_KEY,'1');
-      gate.innerHTML=`<section class="gate-card install-progress"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>INSTALLAZIONE</small></div></div><h1>Installazione in corso…</h1><p class="gate-copy">Configurazione del sistema e preparazione delle applicazioni.</p><div class="gate-progress"><span id="coreInstallProgress" style="width:8%"></span></div><p id="coreInstallStatus" class="gate-note">Configurazione sistema…</p></section>`;
-      const bar=document.getElementById('coreInstallProgress'),status=document.getElementById('coreInstallStatus');
-      for(const [pct,label] of [[38,'Installazione applicazioni…'],[72,'Salvataggio impostazioni…'],[100,'Finalizzazione…']]){await new Promise(resolve=>setTimeout(resolve,1000));bar.style.width=pct+'%';status.textContent=label;}
-      applyConfig();enterDesktop(profile.user,profile.name);
+    let step=0;
+    const appChoices=[['files','File Manager'],['browser','Browser'],['terminal','Terminale'],['calculator','Calcolatrice'],['calendar','Calendario'],['notes','Notepad'],['paint','Paint'],['media','Media Player'],['weather','Meteo']];
+    const render=()=>{
+      const start=step*10,items=allOptions.slice(start,start+10),total=4;
+      const options=items.map(optionMarkup).join('');
+      const custom=step===4;
+      gate.innerHTML=`<section class="gate-card setup-wizard">
+        <div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS SETUP</strong><small>PERSONALIZZA IL TUO SISTEMA</small></div></div>
+        <div class="gate-eyebrow">INSTALLAZIONE · PASSAGGIO ${step+1} DI 5</div>
+        <h1>${['Aspetto e stile','Desktop e barra','Finestre e interazione','Sistema e privacy','Dispositivo e applicazioni'][step]}</h1>
+        <p class="gate-copy">${custom?'Scegli orientamento, lingua e applicazioni da includere.':'Configura queste 10 opzioni. Potrai modificarle in seguito dalle Impostazioni.'}</p>
+        <div class="setup-step-track" aria-label="Avanzamento installazione">${[0,1,2,3,4].map(n=>`<span class="${n<=step?'active':''}"></span>`).join('')}</div>
+        <div class="setup-step-count">${custom?'Configurazione finale':'10 impostazioni in questo passaggio'}</div>
+        <div class="option-groups setup-options">${custom?`
+          <div class="option-group"><h3>Dispositivo</h3>
+            <div class="option-row"><label for="coreDeviceMode">Modalità</label><select id="coreDeviceMode"><option value="desktop">Desktop orizzontale</option><option value="mobile">Mobile verticale</option></select></div>
+            <div class="option-row"><label for="coreLanguage">Lingua</label><select id="coreLanguage"><option value="it">Italiano</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option></select></div>
+          </div>
+          <div class="option-group"><h3>Applicazioni incluse</h3><p class="core-muted">Puoi scegliere tutte le applicazioni che vuoi.</p><div class="core-app-choice-grid">${appChoices.map(([id,label])=>`<label><input type="checkbox" data-core-app="${id}" checked> ${label}</label>`).join('')}</div></div>
+        `:`<div class="option-group"><h3>Opzioni ${start+1}–${Math.min(start+10,allOptions.length)} di ${allOptions.length}</h3>${options}</div>`}</div>
+        <div class="gate-error" id="setupError"></div>
+        <div class="gate-actions setup-actions"><button class="gate-btn ghost" id="setupBack">${step===0?'Indietro':'Precedente'}</button><button class="gate-btn primary" id="setupNext">${step===4?'Installa CoreOS':'Continua →'}</button></div>
+      </section>`;
+      gate.querySelectorAll('[data-config]').forEach(el=>el.value=config[el.dataset.config]??defaults[el.dataset.config]??'');
+      if(custom){
+        document.getElementById('coreDeviceMode').value=config.deviceMode||'desktop';
+        document.getElementById('coreLanguage').value=config.language||'it';
+        gate.querySelectorAll('[data-core-app]').forEach(el=>el.checked=(config.installedApps||appChoices.map(x=>x[0])).includes(el.dataset.coreApp));
+      }
+      document.getElementById('setupBack').onclick=()=>{if(step===0){showCreate();return;}step--;render();};
+      document.getElementById('setupNext').onclick=async()=>{
+        gate.querySelectorAll('[data-config]').forEach(el=>config[el.dataset.config]=el.value);
+        if(step<4){step++;render();return;}
+        config.deviceMode=document.getElementById('coreDeviceMode').value;
+        config.language=document.getElementById('coreLanguage').value;
+        config.installedApps=[...gate.querySelectorAll('[data-core-app]:checked')].map(el=>el.dataset.coreApp);
+        localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
+        localStorage.setItem(PROFILE_KEY,JSON.stringify({...profile,createdAt:new Date().toISOString()}));
+        localStorage.setItem(SESSION_KEY,'1');
+        gate.innerHTML=`<section class="gate-card install-progress"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>INSTALLAZIONE</small></div></div><h1>Installazione in corso…</h1><p class="gate-copy">Preparazione del tuo ambiente personale.</p><div class="gate-progress"><span id="coreInstallProgress" style="width:5%"></span></div><p id="coreInstallStatus" class="gate-note">Configurazione sistema…</p></section>`;
+        const bar=document.getElementById('coreInstallProgress'),status=document.getElementById('coreInstallStatus');
+        for(const [pct,label] of [[20,'Applicazione preferenze…'],[42,'Preparazione applicazioni…'],[66,'Configurazione desktop…'],[86,'Salvataggio profilo…'],[100,'Completamento installazione…']]){await new Promise(resolve=>setTimeout(resolve,650));bar.style.width=pct+'%';status.textContent=label;}
+        applyConfig();enterDesktop(profile.user,profile.name);
+      };
     };
+    render();
   }
   function showLogin(){
-    gate.innerHTML=`<section class="gate-card" style="max-width:520px"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>ACCESSO UTENTE</small></div></div><div class="gate-eyebrow">BENTORNATO</div><h1>Accedi al tuo OS.</h1><form id="loginForm" class="gate-form"><div class="gate-field full"><label>Username</label><input id="loginUser" autocomplete="username" required></div><div class="gate-field full"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password" required></div></form><div class="gate-error" id="loginError"></div><div class="gate-actions"><button class="gate-btn ghost" id="loginBack">Indietro</button><button class="gate-btn primary" id="loginGo">Accedi</button></div></section>`;
+    gate.innerHTML=`<section class="gate-card" style="max-width:520px"><div class="gate-brand"><div class="gate-mark">C</div><div><strong>COREOS</strong><small>ACCESSO UTENTE</small></div></div><div class="gate-eyebrow">BENTORNATO</div><h1>Accedi al tuo OS.</h1><form id="loginForm" class="gate-form"><div class="gate-field full"><label>Username</label><input id="loginUser" autocomplete="username" required></div><div class="gate-field full"><label>PIN (5 cifre numeriche)</label><input id="loginPass" type="password" inputmode="numeric" pattern="[0-9]{5}" minlength="5" maxlength="5" autocomplete="current-password" required></div></form><div class="gate-error" id="loginError"></div><div class="gate-actions"><button class="gate-btn ghost" id="loginBack">Indietro</button><button class="gate-btn primary" id="loginGo">Accedi</button></div></section>`;
     document.getElementById('loginBack').onclick=showWelcome;
     document.getElementById('loginGo').onclick=async()=>{
       let profile;try{profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null')}catch{}
       const user=document.getElementById('loginUser').value.trim(), pass=document.getElementById('loginPass').value;
+      if(!/^[0-9]{5}$/.test(pass)){document.getElementById('loginError').textContent='Il PIN deve contenere esattamente 5 cifre numeriche.';return;}
       if(!profile||profile.user!==user){document.getElementById('loginError').textContent='Profilo non trovato su questo browser.';return;}
       const hash=await hashPassword(pass,profile.salt);
       if(hash!==profile.hash){document.getElementById('loginError').textContent='Password non corretta. Non è previsto il reset della password.';return;}
