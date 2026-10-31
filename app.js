@@ -50,6 +50,17 @@ function setupNotes(){
  area.addEventListener('input',()=>{localStorage.setItem('coreos-notes',area.value);status.textContent='Salvato su questo dispositivo';});
  clear.onclick=()=>{if(confirm('Vuoi cancellare tutti gli appunti?')){area.value='';localStorage.removeItem('coreos-notes');status.textContent='Appunti cancellati';}};
 }
+function evaluateCoreExpression(source){
+ const tokens=source.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').match(/(?:\d+(?:\.\d*)?|\.\d+)|[()+\-*/%]/g)||[];
+ const compact=source.replace(/\s/g,'').replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+ if(tokens.join('')!==compact||!tokens.length)throw new Error('Espressione non valida');
+ let i=0;
+ const primary=()=>{const t=tokens[i++];if(t==='('){const v=expression();if(tokens[i++]!==')')throw Error('Parentesi non chiusa');return v;}if(t==='+'||t==='-')return (t==='-'?-1:1)*primary();if(t===undefined||!/^\d/.test(t)&&!/^\.\d/.test(t))throw Error('Numero atteso');const n=Number(t);if(!Number.isFinite(n))throw Error('Numero non valido');return n;};
+ const postfix=()=>{let v=primary();while(tokens[i]==='%'){i++;v/=100;}return v;};
+ const term=()=>{let v=postfix();while(tokens[i]==='*'||tokens[i]==='/'){const op=tokens[i++],n=postfix();v=op==='*'?v*n:v/n;}return v;};
+ const expression=()=>{let v=term();while(tokens[i]==='+'||tokens[i]==='-'){const op=tokens[i++],n=term();v=op==='+'?v+n:v-n;}return v;};
+ const value=expression();if(i!==tokens.length||!Number.isFinite(value))throw Error('Risultato non valido');return Number(value.toPrecision(12));
+}
 function setupCalculator(){
  const display=document.getElementById('calcDisplay');let expr='';
  document.querySelectorAll('[data-calc]').forEach(btn=>btn.onclick=()=>{
@@ -57,13 +68,8 @@ function setupCalculator(){
   if(k==='C'){expr='';display.value='0';return;}
   if(k==='⌫'){expr=expr.slice(0,-1);display.value=expr||'0';return;}
   if(k==='='){
-   try{
-    const safe=expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
-    if(!/^[0-9+\-*/().\s]+$/.test(safe))throw Error();
-    const result=Function('"use strict";return ('+safe+')')();
-    if(!Number.isFinite(result))throw Error();
-    expr=String(Number(result.toFixed(8)));display.value=expr;
-   }catch{display.value='Errore';expr='';}
+   try{const result=evaluateCoreExpression(expr);expr=String(result);display.value=expr;}
+   catch{display.value='Errore';expr='';}
    return;
   }
   expr+=k;display.value=expr;
