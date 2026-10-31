@@ -100,47 +100,34 @@
     const bootstrap = `
       (() => {
         'use strict';
-        const channel = new MessageChannel();
-        const pending = new Map(); let seq = 0;
-        channel.port1.onmessage = event => {
-          const m = event.data; if (m?.type !== 'response') return;
-          const p = pending.get(m.id); if (!p) return; pending.delete(m.id);
-          m.ok ? p.resolve(m.value) : p.reject(new Error(m.value));
-        };
-        const call = (method, ...args) => new Promise((resolve,reject) => {
-          const id = ++seq; pending.set(id,{resolve,reject});
-          channel.port1.postMessage({type:'request',id,method,args});
-        });
-        const CoreOS = Object.freeze({
-          app: Object.freeze({id:${JSON.stringify(id)}, title:${JSON.stringify(safeTitle)}}),
-          storage: Object.freeze({get:key=>call('storage.get',key),set:(key,value)=>call('storage.set',key,value),remove:key=>call('storage.remove',key)}),
-          files: Object.freeze({list:()=>call('files.list'),download:id=>call('files.download',id),trash:id=>call('files.trash',id)}),
-          downloads: Object.freeze({save:(name,data,mime)=>call('downloads.save',name,data,mime)}),
-          network: Object.freeze({fetchJson:url=>call('network.fetch',url)}),
-          system: Object.freeze({notify:(title,body)=>call('system.notify',title,body),info:()=>call('system.info')})
-        });
-        Object.defineProperty(window,'CoreOS',{value:CoreOS,writable:false,configurable:false});
-        window.addEventListener('message', event => {
-          if (event.data?.type === 'coreos:init' && event.ports?.[0]) {
-            channel.port1.close(); channel.port2.close();
-            const hostPort = event.ports[0];
-            hostPort.onmessage = e => { const m=e.data; if(m?.type==='response'){const p=pending.get(m.id);if(p){pending.delete(m.id);m.ok?p.resolve(m.value):p.reject(new Error(m.value));}} };
-            const oldCall = call;
-            // Replace transport with the dedicated, unforgeable MessagePort.
-            apiPort = hostPort;
-            readyResolve();
-          }
-        });
-        let apiPort = null, readyResolve;
-        const ready = new Promise(resolve => { readyResolve=resolve; });
+        let apiPort = null, seq = 0;
+        const pending = new Map();
+        const ready = new Promise(resolve => { window.__coreosReady = resolve; });
         const invoke = (method,...args) => ready.then(()=>new Promise((resolve,reject)=>{
-          const id=++seq; pending.set(id,{resolve,reject}); apiPort.postMessage({type:'request',id,method,args});
+          const id=++seq; pending.set(id,{resolve,reject});
+          apiPort.postMessage({type:'request',id,method,args});
         }));
-        for (const group of ['storage','files','downloads','network','system']) {
-          const target=CoreOS[group];
-          for (const key of Object.keys(target)) Object.defineProperty(target,key,{value:(...args)=>invoke(group+'.'+key,...args)});
-        }
-        window.dispatchEvent(new Event('coreos:ready'));
+        const api = {
+          storage:{get:key=>invoke('storage.get',key),set:(key,value)=>invoke('storage.set',key,value),remove:key=>invoke('storage.remove',key)},
+          files:{list:()=>invoke('files.list'),download:id=>invoke('files.download',id),trash:id=>invoke('files.trash',id)},
+          downloads:{save:(name,data,mime)=>invoke('downloads.save',name,data,mime)},
+          network:{fetchJson:url=>invoke('network.fetch',url)},
+          system:{notify:(title,body)=>invoke('system.notify',title,body),info:()=>invoke('system.info')}
+        };
+        Object.values(api).forEach(Object.freeze);
+        Object.freeze(api);
+        Object.defineProperty(window,'CoreOS',{value:Object.freeze({app:Object.freeze({id:${JSON.stringify("${JSON.stringify(id)}")},title:${JSON.stringify("${JSON.stringify(safeTitle)}")}}),...api}),writable:false,configurable:false});
+        window.addEventListener('message', event => {
+          if (event.data?.type !== 'coreos:init' || !event.ports?.[0] || apiPort) return;
+          apiPort = event.ports[0];
+          apiPort.onmessage = e => {
+            const m=e.data; if(m?.type!=='response')return;
+            const p=pending.get(m.id); if(!p)return; pending.delete(m.id);
+            m.ok?p.resolve(m.value):p.reject(new Error(m.value));
+          };
+          window.__coreosReady();
+          window.dispatchEvent(new Event('coreos:ready'));
+        });
       })();
       `;
     const csp = "default-src 'none'; img-src data: blob:; media-src blob: data:; style-src 'unsafe-inline'; script-src 'nonce-" + nonce + "'; connect-src 'none'; font-src data:; form-action 'none'; base-uri 'none'";
