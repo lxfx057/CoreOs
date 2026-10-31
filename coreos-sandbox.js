@@ -116,7 +116,7 @@
         };
         Object.values(api).forEach(Object.freeze);
         Object.freeze(api);
-        Object.defineProperty(window,'CoreOS',{value:Object.freeze({app:Object.freeze({id:${JSON.stringify("${JSON.stringify(id)}")},title:${JSON.stringify("${JSON.stringify(safeTitle)}")}}),...api}),writable:false,configurable:false});
+        Object.defineProperty(window,'CoreOS',{value:Object.freeze({app:Object.freeze({id:${JSON.stringify(id)},title:${JSON.stringify(safeTitle)}}),...api}),writable:false,configurable:false});
         window.addEventListener('message', event => {
           if (event.data?.type !== 'coreos:init' || !event.ports?.[0] || apiPort) return;
           apiPort = event.ports[0];
