@@ -276,7 +276,7 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
   }
   function showOptions(profile){
     let step=0;
-    const appChoices=[['files','File Manager'],['browser','Browser'],['terminal','Terminale'],['calculator','Calcolatrice'],['calendar','Calendario'],['notes','Notepad'],['paint','Paint'],['media','Media Player'],['weather','Meteo']];
+    const appChoices=[['files','File Manager'],['browser','Browser'],['terminal','Terminale'],['calculator','Calcolatrice'],['calendar','Calendario'],['notes','Notepad'],['paint','Paint'],['media','Media Player'],['weather','Meteo'],['tasks','Attività'],['stopwatch','Cronometro'],['viewer','Visualizzatore immagini'],['minesweeper','Minesweeper'],['settings','Impostazioni'],['monitor','Monitor di sistema']];
     const render=()=>{
       const start=step*10,items=allOptions.slice(start,start+10),total=4;
       const options=items.map(optionMarkup).join('');
