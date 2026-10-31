@@ -4,7 +4,7 @@
  */
 (() => {
   'use strict';
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const instances = new Map();
   const manifests = Object.freeze({
     files:       { permissions: ['files.read','files.write','downloads'] },
@@ -20,9 +20,10 @@
     stopwatch:   { permissions: ['storage.local'] },
     viewer:      { permissions: ['files.read'] },
     minesweeper: { permissions: ['storage.local'] },
-    settings:    { permissions: ['system.settings'] }
+    settings:    { permissions: ['system.settings','storage.local'] },
+    monitor:     { permissions: ['system.info'] }
   });
-  const clone = value => structuredClone(value);
+  const clone = value => { if(typeof structuredClone==='function')return structuredClone(value); return JSON.parse(JSON.stringify(value)); };
   const safeId = value => String(value || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 48);
   const instancesStore = 'coreos.sandbox.storage.v1';
   const readStore = () => { try { return JSON.parse(localStorage.getItem(instancesStore) || '{}'); } catch { return {}; } };
@@ -35,6 +36,8 @@
   }
   async function handle(instance, message) {
     const { method, args = [] } = message;
+    if(typeof method!=='string'||method.length>80||!Array.isArray(args)||args.length>12)throw new Error('Richiesta API non valida');
+    let encoded;try{encoded=JSON.stringify(args)}catch{throw new Error('Dati non serializzabili')};if(encoded.length>1_000_000)throw new Error('Richiesta troppo grande');
     switch (method) {
       case 'storage.get': {
         requirePermission(instance, 'storage.local');
@@ -44,13 +47,14 @@
         requirePermission(instance, 'storage.local');
         const [key, value] = args;
         if (typeof key !== 'string' || key.length > 120) throw new Error('Chiave non valida');
-        const data = readStore(); data[instance.id] ||= {}; data[instance.id][key] = clone(value); writeStore(data); return true;
+        const data = readStore(); data[instance.id] ||= {}; data[instance.id][key] = clone(value); const serialized=JSON.stringify(data); if(serialized.length>2_000_000)throw new Error('Spazio app esaurito (2 MB)'); writeStore(data); return true;
       }
       case 'storage.remove': {
         requirePermission(instance, 'storage.local');
         const data = readStore(); if (data[instance.id]) delete data[instance.id][String(args[0])]; writeStore(data); return true;
       }
       case 'system.notify': {
+        requirePermission(instance, 'system.notify');
         if (typeof args[0] !== 'string') throw new Error('Notifica non valida');
         const title = args[0].slice(0, 80), body = String(args[1] || '').slice(0, 300);
         const event = new CustomEvent('coreos:app-notification', { detail: { appId: instance.id, title, body } });
@@ -85,7 +89,8 @@
         const url = new URL(String(args[0]));
         const allowed = ['api.open-meteo.com','geocoding-api.open-meteo.com'];
         if (url.protocol !== 'https:' || !allowed.includes(url.hostname)) throw new Error('Origine di rete non autorizzata');
-        const response = await fetch(url.href, { method:'GET', mode:'cors', credentials:'omit', referrerPolicy:'no-referrer' });
+        const controller = new AbortController(); const timeout=setTimeout(()=>controller.abort(),12000);
+        let response; try { response=await fetch(url.href, { method:'GET', mode:'cors', credentials:'omit', referrerPolicy:'no-referrer', signal:controller.signal }); } finally { clearTimeout(timeout); }
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return { status:response.status, data:await response.json() };
       }
@@ -153,7 +158,7 @@
     options.container.replaceChildren(frame);
     const channel = new MessageChannel(); instance.port=channel.port1;
     channel.port1.onmessage = async event => {
-      const m=event.data; if(m?.type!=='request' || !Number.isInteger(m.id))return;
+      const m=event.data; if(m?.type!=='request' || !Number.isSafeInteger(m.id) || m.id<1)return;
       try { const value=await handle(instance,m); respond(channel.port1,m.id,true,value); }
       catch(error){ respond(channel.port1,m.id,false,error); }
     };
