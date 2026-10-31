@@ -323,3 +323,43 @@ body{min-height:100svh;min-height:100dvh}
  .app-window.core-resizable-window .core-resize-n,.app-window.core-resizable-window .core-resize-s{height:18px}
 }
 @media(prefers-reduced-motion:reduce){.core-window-resize{transition:none!important}}
+
+/* CoreOS interaction and adaptive window system */
+.app-window.core-resizable-window{display:flex;flex-direction:column;overflow:hidden;max-height:min(82dvh,820px);min-height:220px;isolation:isolate;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transition:box-shadow .22s ease,border-color .22s ease}
+.app-window.core-resizable-window:focus-within{border-color:color-mix(in srgb,var(--blue,#168df0) 55%,transparent);box-shadow:0 26px 90px #0009,0 0 0 1px color-mix(in srgb,var(--blue,#168df0) 22%,transparent)}
+.app-window.core-resizable-window .window-head{position:relative;flex:0 0 52px;display:flex;gap:12px;cursor:grab;touch-action:none}
+.app-window.core-resizable-window .window-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.core-window-controls{display:flex;align-items:center;gap:6px;order:2}
+.core-window-action{width:30px;height:30px;border:1px solid var(--line);border-radius:9px;background:var(--panel2,#252c37);color:var(--text,#eef3fa);font-size:15px;display:grid;place-items:center;cursor:pointer;transition:background .18s ease,transform .18s ease}
+.core-window-action:hover{background:var(--blue,#168df0);color:white;transform:translateY(-1px)}
+.core-window-controls .window-close{order:3;width:30px;height:30px;border:1px solid var(--line);color:var(--text,#eef3fa)}
+.app-window.core-resizable-window .window-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:clamp(14px,2.2vw,22px)}
+.app-window.core-window-maximized{position:fixed!important;inset:calc(var(--core-topbar-size,0px) + env(safe-area-inset-top)) 8px calc(var(--core-dock-size,0px) + env(safe-area-inset-bottom) + 8px) 8px!important;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important;min-height:0!important;transform:none!important;border-radius:16px;z-index:40}
+.app-window.core-window-minimized{display:none!important}
+.core-restore-window{position:fixed;z-index:150;left:50%;bottom:calc(var(--core-dock-size,62px) + env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);padding:11px 18px;border:1px solid var(--line);border-radius:999px;background:var(--panel,#202733);color:var(--text,#fff);box-shadow:0 10px 32px #0007;font:600 13px system-ui;cursor:pointer}
+.core-window-resize{opacity:.0;transition:opacity .18s ease}
+.app-window.core-resizable-window:hover .core-window-resize,.app-window.core-resizable-window:focus-within .core-window-resize{opacity:.65}
+.app-window.core-resizable-window .core-resize-n,.app-window.core-resizable-window .core-resize-s{height:10px}
+.app-window.core-resizable-window .core-resize-e,.app-window.core-resizable-window .core-resize-w{width:10px}
+.app-window.core-resizable-window button:focus-visible,.app-window.core-resizable-window input:focus-visible,.app-window.core-resizable-window select:focus-visible,.app-window.core-resizable-window textarea:focus-visible{outline:2px solid var(--blue,#168df0);outline-offset:2px}
+.launcher-app{transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s ease,border-color .2s ease,box-shadow .2s ease}
+.launcher-app:hover{background:color-mix(in srgb,var(--blue,#168df0) 12%,transparent);border-color:color-mix(in srgb,var(--blue,#168df0) 32%,transparent);transform:translateY(-2px)}
+.launcher-app:focus-visible,.dock-app:focus-visible,.top-menu-button:focus-visible{outline:2px solid var(--blue,#168df0);outline-offset:3px}
+.window-layer.has-window{pointer-events:auto}
+@media(max-width:700px){
+ .app-window.core-resizable-window{left:50%;top:50%;width:calc(100vw - 16px);max-width:calc(100vw - 16px);height:min(78dvh,760px);max-height:calc(100dvh - var(--core-topbar-size,42px) - var(--core-dock-size,62px) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);min-height:200px;border-radius:17px}
+ .app-window.core-resizable-window .window-head{flex-basis:48px;padding-inline:12px}
+ .app-window.core-resizable-window .window-body{padding:14px}
+ .core-window-action,.core-window-controls .window-close{width:34px;height:34px;min-width:34px}
+ .app-window.core-resizable-window .core-window-resize{opacity:.38;width:24px;height:24px}
+ .app-window.core-resizable-window .core-resize-e,.app-window.core-resizable-window .core-resize-w{top:22px;bottom:22px;width:18px}
+ .app-window.core-resizable-window .core-resize-n,.app-window.core-resizable-window .core-resize-s{left:22px;right:22px;height:18px}
+ .app-window.core-window-maximized{inset:calc(var(--core-topbar-size,42px) + env(safe-area-inset-top) + 4px) 4px calc(var(--core-dock-size,62px) + env(safe-area-inset-bottom) + 4px) 4px!important}
+}
+@media(hover:none){
+ .launcher-app:hover{transform:none}
+ .app-window.core-resizable-window .core-window-resize{opacity:.42}
+}
+@media(prefers-reduced-motion:reduce){
+ .app-window.core-resizable-window,.core-window-action,.launcher-app{animation:none!important;transition:none!important}
+}
