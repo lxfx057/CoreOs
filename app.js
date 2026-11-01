@@ -420,7 +420,7 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     root.dataset.coreWindowStyle=config.windowStyle;
     root.dataset.coreShadows=config.shadows;
     root.dataset.coreMode=config.deviceMode||'desktop';
-    document.querySelectorAll('.launcher-app[data-open],.desktop-shortcut[data-open],.dock-app[data-open]').forEach(el=>{const id=el.dataset.open;const chosen=config.installedApps||['files','browser','terminal','calculator','calendar','notes','paint','media','weather'];el.hidden=!['apps','settings','monitor','about','store'].includes(id)&&!chosen.includes(id);});
+    document.querySelectorAll('.launcher-app[data-open],.desktop-shortcut[data-open],.dock-app[data-open]').forEach(el=>{const id=el.dataset.open;const chosen=config.installedApps||['files','browser','terminal','calculator','calendar','notes','paint','media','weather'];el.hidden=!['apps','settings','about','store'].includes(id)&&!chosen.includes(id);});
     if(config.statusBar==='off')document.querySelector('.topbar')?.classList.add('core-hidden');
     else document.querySelector('.topbar')?.classList.remove('core-hidden');
     if(config.animations==='off'||config.reducedMotion==='on')root.classList.add('core-reduced-motion');
