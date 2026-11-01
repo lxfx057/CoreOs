@@ -69,14 +69,13 @@
    category=next==='all'?'all':next;
    categories.forEach(x=>x.classList.toggle('category-active',x===b));filter();
   }));
-  buttons.forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.open;if(id&&id!=='apps')window.openApp?.(id);closeLauncher();}));
   filter();
  }
  function connectLauncher(){
   const trigger=$('#startButton'),appDock=$('.dock [data-open="apps"]');
   const toggle=()=>{if(!launcher)return;launcher.hidden=!launcher.hidden;if(!launcher.hidden){const s=$('#launcherSearch');s?.focus();s?.select();}};
   trigger?.addEventListener('click',toggle);
-  appDock?.addEventListener('click',e=>{e.preventDefault();toggle();});
+  appDock?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();toggle();});
   launcherSetup();
  }
  function addSystemClock(){
