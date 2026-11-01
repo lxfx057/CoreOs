@@ -21,7 +21,6 @@
     viewer:      { permissions: ['files.read'] },
     minesweeper: { permissions: ['storage.local'] },
     settings:    { permissions: ['system.settings','storage.local'] },
-    monitor:     { permissions: ['system.info'] }
   });
   const clone = value => { if(typeof structuredClone==='function')return structuredClone(value); return JSON.parse(JSON.stringify(value)); };
   const safeId = value => String(value || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 48);
