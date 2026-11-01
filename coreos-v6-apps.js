@@ -39,7 +39,7 @@ function initApp(name){
 if(name==='browser'){const form=$('#v6BrowserForm'),url=$('#v6BrowserUrl'),frame=$('#v6BrowserFrame'),normal=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;url.value=u;frame.src=u};form.onsubmit=e=>{e.preventDefault();normal()};$('#v6BrowserExternal').onclick=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;openUrl(u)};normal()}
 if(name==='browser'){
  const form=$('#v6BrowserForm'),url=$('#v6BrowserUrl'),frame=$('#v6BrowserFrame'),status=$('#v6BrowserStatus');
- const normalize=()=>{let u=url.value.trim();if(!u)return '';if(!/^https?:\\/\\//i.test(u)){if(u.includes('.')&&!u.includes(' '))u='https://'+u;else u='https://www.google.com/search?q='+encodeURIComponent(u)}try{const x=new URL(u);if(!['http:','https:'].includes(x.protocol))throw Error();return x.href}catch{return ''}};
+ const normalize=()=>{let u=url.value.trim();if(!u)return '';if(!u.toLowerCase().startsWith('http://')&&!u.toLowerCase().startsWith('https://')){if(u.includes('.')&&!u.includes(' '))u='https://'+u;else u='https://www.google.com/search?q='+encodeURIComponent(u)}try{const x=new URL(u);if(!['http:','https:'].includes(x.protocol))throw Error();return x.href}catch{return ''}};
  const navigate=()=>{if(!navigator.onLine){status.textContent='Sei offline: connettiti a Internet per navigare.';return}const u=normalize();if(!u){status.textContent='Indirizzo non valido.';return}url.value=u;status.textContent='Caricamento: '+u;frame.src=u;};
  form.onsubmit=e=>{e.preventDefault();navigate()};
  $('#v6BrowserHome').onclick=()=>{url.value='https://www.google.com';navigate()};
