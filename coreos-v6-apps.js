@@ -126,6 +126,7 @@ async function renderFiles(trash){
  const host=$('#v6FilesList'),search=$('#v6FileSearch'),sort=$('#v6FileSort'),usage=$('#v6StorageUsage');
  if(!host)return;
  try{
+  host.dataset.trash=String(trash);
   const all=await getFiles(),query=(search?.value||'').trim().toLocaleLowerCase('it');
   let rows=all.filter(x=>!!x.trash===trash).filter(x=>!query||x.name.toLocaleLowerCase('it').includes(query)||(x.type||'').toLocaleLowerCase('it').includes(query));
   const order=sort?.value||'newest';
@@ -196,6 +197,23 @@ function addAppPreferences(name){
 }
 
 window.openApp=function(name){original(name);initApp(name);addAppPreferences(name)};
+
+
+const fileManagerStyle=document.createElement('style');fileManagerStyle.textContent=`
+.v6-file-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;margin:12px 0}
+.v6-file-toolbar input,.v6-file-toolbar select{min-width:0;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text)}
+.v6-storage-usage{font-size:11px;color:var(--muted);padding:8px 2px}
+.v6-file-item{display:flex;align-items:center;gap:12px;padding:12px;margin:8px 0;border:1px solid var(--line);border-radius:13px;background:var(--panel2);min-width:0}
+.v6-file-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:11px;background:var(--panel);font-weight:700;font-size:15px}
+.v6-file-meta{display:grid;gap:4px;min-width:0;flex:1}
+.v6-file-meta strong{font-size:13px;overflow-wrap:anywhere}
+.v6-file-meta small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.v6-file-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.v6-file-actions button{font-size:10px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text)}
+.v6-file-actions .danger{color:#f08a8a}
+.v6-file-empty{padding:24px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:13px}
+@media(max-width:560px){.v6-file-item{align-items:flex-start;flex-wrap:wrap}.v6-file-actions{width:100%;justify-content:flex-start}.v6-file-actions button{flex:1 1 auto}.v6-file-toolbar{grid-template-columns:1fr}}
+`;document.head.append(fileManagerStyle);
 
 const prefStyle=document.createElement('style');prefStyle.textContent=`
 .v6-app-preferences{margin:18px 0 4px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);font:inherit}
