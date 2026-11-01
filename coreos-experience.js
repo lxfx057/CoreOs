@@ -50,8 +50,10 @@
   const categoryFor=id=>({
    files:'system',terminal:'system',monitor:'system',settings:'system',apps:'system',store:'system',
    browser:'internet',weather:'internet',
-   notes:'office',calendar:'office',tasks:'office',paint:'creative',media:'creative',viewer:'creative',
-   calculator:'utilities',stopwatch:'utilities',minesweeper:'games',pomodoro:'utilities',converter:'utilities',passwords:'utilities'
+   notes:'office',calendar:'office',tasks:'office',
+   paint:'creative',media:'creative',viewer:'creative',
+   calculator:'utilities',stopwatch:'utilities',pomodoro:'utilities',converter:'utilities',passwords:'utilities',
+   minesweeper:'games'
   }[id]||'all');
   let category='all';
   function filter(){
@@ -65,7 +67,6 @@
   search?.addEventListener('input',filter);
   categories.forEach(b=>b.addEventListener('click',()=>{
    const next=b.dataset.category;
-   if(next==='add'){const name=prompt('Nome del gruppo:');if(name?.trim())b.textContent='＋ '+name.trim();return;}
    category=next==='all'?'all':next;
    categories.forEach(x=>x.classList.toggle('category-active',x===b));filter();
   }));
