@@ -12,6 +12,8 @@
   const win=layer.querySelector('.app-window'),head=win?.querySelector('.window-head');
   if(!win||!head)return;
   activeApp=name;
+  minimized.forEach(chip=>chip.remove());minimized.clear();
+  layer.classList.add('has-window');
   win.dataset.app=name;
   win.setAttribute('aria-modal','false');
   win.querySelectorAll('.core-window-actions').forEach(x=>x.remove());
@@ -31,12 +33,12 @@
   closeLauncher();
  }
  function minimize(win,name){
-  win.hidden=true;
+  win.hidden=true;layer.classList.remove('has-window');
   if(!dock)return;
   let chip=minimized.get(name);
   if(!chip){
    chip=document.createElement('button');chip.type='button';chip.className='core-dock-window';chip.textContent=win.querySelector('.window-title')?.textContent||name;
-   chip.title='Ripristina '+name;chip.addEventListener('click',()=>{win.hidden=false;win.classList.add('core-window-focused');chip.remove();minimized.delete(name);});
+   chip.title='Ripristina '+name;chip.addEventListener('click',()=>{win.hidden=false;layer.classList.add('has-window');win.classList.add('core-window-focused');chip.remove();minimized.delete(name);});
    dock.append(chip);minimized.set(name,chip);
   }
  }
