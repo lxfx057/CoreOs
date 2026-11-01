@@ -30,6 +30,11 @@ define('tasks','CoreOS Tasks','<section class="v6-tasks"><h3>Attività</h3><form
 define('stopwatch','Cronometro CoreOS','<section class="v6-stopwatch"><div id="v6StopwatchDisplay">00:00.00</div><div class="v6-tools"><button id="v6StopwatchStart">Avvia</button><button id="v6StopwatchLap">Giro</button><button id="v6StopwatchReset">Azzera</button></div><ol id="v6StopwatchLaps"></ol></section>');
 define('viewer','Visualizzatore immagini','<section class="v6-viewer"><label class="v6-upload">Apri immagini<input id="v6ViewerFiles" type="file" accept="image/*" multiple></label><div id="v6ViewerGallery"></div><img id="v6ViewerImage" alt="Anteprima immagine selezionata"><p id="v6ViewerName" class="v6-hint">Seleziona una o più immagini dal dispositivo.</p></section>');
 define('minesweeper','CoreOS Minesweeper','<section class="v6-mines"><div class="v6-tools"><button id="mineNew">Nuova partita</button><span id="mineStatus">Trova le 10 mine</span></div><div id="mineGrid" class="mine-grid"></div></section>');
+
+define('pomodoro','CoreOS Focus','<section class="v6-pomodoro"><p>Sessioni di concentrazione e pause, con timer locale.</p><div class="v6-tools"><label>Focus <select id="focusMinutes"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option></select></label><label>Pausa <select id="breakMinutes"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></label></div><div id="focusMode">Concentrazione</div><output id="focusClock">25:00</output><div class="v6-tools"><button id="focusStart">Avvia</button><button id="focusPause">Pausa</button><button id="focusReset">Azzera</button></div><p id="focusStatus" class="v6-hint">Pronto per iniziare.</p></section>');
+define('converter','Convertitore CoreOS','<section class="v6-converter"><p>Conversioni rapide di lunghezza, peso, temperatura e dati.</p><label>Categoria <select id="convertCategory"><option value="length">Lunghezza</option><option value="weight">Peso</option><option value="temperature">Temperatura</option><option value="data">Dati digitali</option></select></label><div class="v6-tools"><input id="convertValue" type="number" value="1" step="any" aria-label="Valore"><select id="convertFrom"></select><span>→</span><select id="convertTo"></select></div><output id="convertResult">—</output></section>');
+define('passwords','Generatore password','<section class="v6-passwords"><p>Genera password casuali localmente: non vengono inviate in rete né salvate automaticamente.</p><label>Lunghezza <input id="passwordLength" type="range" min="8" max="64" value="20"><output id="passwordLengthValue">20</output></label><div class="v6-tools"><label><input id="passwordUpper" type="checkbox" checked> Maiuscole</label><label><input id="passwordLower" type="checkbox" checked> Minuscole</label><label><input id="passwordNumbers" type="checkbox" checked> Numeri</label><label><input id="passwordSymbols" type="checkbox" checked> Simboli</label></div><output id="passwordResult">Premi Genera password</output><div class="v6-tools"><button id="passwordGenerate">Genera password</button><button id="passwordCopy">Copia</button></div><p id="passwordStatus" class="v6-hint" aria-live="polite"></p></section>');
+
 function initApp(name){
 if(name==='browser'){const form=$('#v6BrowserForm'),url=$('#v6BrowserUrl'),frame=$('#v6BrowserFrame'),normal=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;url.value=u;frame.src=u};form.onsubmit=e=>{e.preventDefault();normal()};$('#v6BrowserExternal').onclick=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;openUrl(u)};normal()}
 if(name==='browser'){
@@ -79,6 +84,36 @@ if(name==='viewer'){
  const input=$('#v6ViewerFiles'),gallery=$('#v6ViewerGallery'),image=$('#v6ViewerImage'),name=$('#v6ViewerName');let urls=[];
  input.onchange=()=>{urls.forEach(URL.revokeObjectURL);urls=[];gallery.innerHTML='';[...input.files].forEach(file=>{const u=URL.createObjectURL(file);urls.push(u);const b=document.createElement('button');b.textContent=file.name;b.onclick=()=>{image.src=u;name.textContent=file.name};gallery.append(b)});if(urls[0]){image.src=urls[0];name.textContent=input.files[0].name}};
 }
+
+if(name==='pomodoro'){
+ let remaining=1500,running=false,interval=null,mode='focus';
+ const clock=$('#focusClock'),status=$('#focusStatus'),modeLabel=$('#focusMode'),start=$('#focusStart');
+ const fmt=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+ const draw=()=>{clock.textContent=fmt(remaining);document.title=(running?fmt(remaining)+' · ':'')+'CoreOS'};
+ const stop=()=>{clearInterval(interval);interval=null;running=false;start.textContent='Avvia';};
+ const setMode=m=>{mode=m;remaining=Number($('#'+(m==='focus'?'focusMinutes':'breakMinutes')).value)*60;modeLabel.textContent=m==='focus'?'Concentrazione':'Pausa';status.textContent=m==='focus'?'Tempo di concentrarsi.':'Tempo per una pausa.';draw()};
+ start.onclick=()=>{if(running)return;running=true;start.textContent='In corso';interval=setInterval(()=>{remaining--;draw();if(remaining<=0){stop();status.textContent=mode==='focus'?'Sessione completata! Fai una pausa.':'Pausa terminata: pronto a ripartire.';if(mode==='focus')setMode('break');else setMode('focus') }},1000)};
+ $('#focusPause').onclick=()=>{stop();status.textContent='Timer in pausa.'};
+ $('#focusReset').onclick=()=>{stop();setMode(mode)};
+ $('#focusMinutes').onchange=()=>{if(mode==='focus'){stop();setMode('focus')}};
+ $('#breakMinutes').onchange=()=>{if(mode==='break'){stop();setMode('break')}};
+ setMode('focus');
+}
+if(name==='converter'){
+ const sets={length:{m:1,km:1000,cm:.01,mm:.001,mi:1609.344,ft:.3048},weight:{kg:1,g:.001,mg:.000001,lb:.45359237,oz:.028349523125},data:{B:1,KB:1000,MB:1e6,GB:1e9,KiB:1024,MiB:1048576,GiB:1073741824}};
+ const labels={m:'Metri',km:'Chilometri',cm:'Centimetri',mm:'Millimetri',mi:'Miglia',ft:'Piedi',kg:'Chilogrammi',g:'Grammi',mg:'Milligrammi',lb:'Libbre',oz:'Once',B:'Byte',KB:'KB',MB:'MB',GB:'GB',KiB:'KiB',MiB:'MiB',GiB:'GiB',C:'°C',F:'°F',K:'Kelvin'};
+ const cat=$('#convertCategory'),from=$('#convertFrom'),to=$('#convertTo'),value=$('#convertValue'),out=$('#convertResult');
+ const populate=()=>{const keys=cat.value==='temperature'?['C','F','K']:Object.keys(sets[cat.value]);from.innerHTML=to.innerHTML='';keys.forEach(k=>{for(const el of [from,to]){const o=document.createElement('option');o.value=k;o.textContent=labels[k];el.append(o)}});if(keys.length>1)to.selectedIndex=1;calculate()};
+ const calculate=()=>{const n=Number(value.value);if(!Number.isFinite(n)){out.textContent='Inserisci un valore valido';return}let result;if(cat.value==='temperature'){const c=from.value==='C'?n:from.value==='F'?(n-32)*5/9:n-273.15;result=to.value==='C'?c:to.value==='F'?c*9/5+32:c+273.15}else result=n*sets[cat.value][from.value]/sets[cat.value][to.value];out.textContent=new Intl.NumberFormat('it-IT',{maximumFractionDigits:8}).format(result)+' '+labels[to.value]};
+ cat.onchange=populate;[from,to,value].forEach(el=>el.addEventListener('input',calculate));populate();
+}
+if(name==='passwords'){
+ const length=$('#passwordLength'),lengthOut=$('#passwordLengthValue'),result=$('#passwordResult'),status=$('#passwordStatus');
+ length.oninput=()=>lengthOut.textContent=length.value;
+ $('#passwordGenerate').onclick=()=>{let chars='';if($('#passwordUpper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if($('#passwordLower').checked)chars+='abcdefghijklmnopqrstuvwxyz';if($('#passwordNumbers').checked)chars+='0123456789';if($('#passwordSymbols').checked)chars+='!@#$%^&*()-_=+[]{}?';if(!chars){status.textContent='Seleziona almeno un gruppo di caratteri.';return}const bytes=new Uint32Array(Number(length.value));crypto.getRandomValues(bytes);let password='';for(let i=0;i<bytes.length;i++)password+=chars[bytes[i]%chars.length];result.textContent=password;status.textContent='Generata localmente con il generatore crittografico del browser.'};
+ $('#passwordCopy').onclick=async()=>{try{await navigator.clipboard.writeText(result.textContent);status.textContent='Password copiata negli appunti.'}catch{status.textContent='Copia non disponibile: seleziona il testo manualmente.'}};
+}
+
 if(name==='minesweeper'){
  const grid=$('#mineGrid'),status=$('#mineStatus'),size=9,mines=10;let cells=[],ended=false;
  const start=()=>{ended=false;status.textContent='Trova le 10 mine';cells=Array.from({length:size*size},()=>({mine:false,open:false,flag:false,count:0}));let placed=0;while(placed<mines){const i=Math.floor(Math.random()*cells.length);if(!cells[i].mine){cells[i].mine=true;placed++}}cells.forEach((cell,i)=>{if(cell.mine)return;const x=i%size,y=Math.floor(i/size);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&nx<size&&ny>=0&&ny<size&&cells[ny*size+nx].mine)cell.count++}});render()};
