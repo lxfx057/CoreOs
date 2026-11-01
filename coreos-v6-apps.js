@@ -31,9 +31,9 @@ define('stopwatch','Cronometro CoreOS','<section class="v6-stopwatch"><div id="v
 define('viewer','Visualizzatore immagini','<section class="v6-viewer"><label class="v6-upload">Apri immagini<input id="v6ViewerFiles" type="file" accept="image/*" multiple></label><div id="v6ViewerGallery"></div><img id="v6ViewerImage" alt="Anteprima immagine selezionata"><p id="v6ViewerName" class="v6-hint">Seleziona una o più immagini dal dispositivo.</p></section>');
 define('minesweeper','CoreOS Minesweeper','<section class="v6-mines"><div class="v6-tools"><button id="mineNew">Nuova partita</button><span id="mineStatus">Trova le 10 mine</span></div><div id="mineGrid" class="mine-grid"></div></section>');
 
-define('pomodoro','CoreOS Focus','<section class="v6-pomodoro"><p>Sessioni di concentrazione e pause, con timer locale.</p><div class="v6-tools"><label>Focus <select id="focusMinutes"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option></select></label><label>Pausa <select id="breakMinutes"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></label></div><div id="focusMode">Concentrazione</div><output id="focusClock">25:00</output><div class="v6-tools"><button id="focusStart">Avvia</button><button id="focusPause">Pausa</button><button id="focusReset">Azzera</button></div><p id="focusStatus" class="v6-hint">Pronto per iniziare.</p></section>');
-define('converter','Convertitore CoreOS','<section class="v6-converter"><p>Conversioni rapide di lunghezza, peso, temperatura e dati.</p><label>Categoria <select id="convertCategory"><option value="length">Lunghezza</option><option value="weight">Peso</option><option value="temperature">Temperatura</option><option value="data">Dati digitali</option></select></label><div class="v6-tools"><input id="convertValue" type="number" value="1" step="any" aria-label="Valore"><select id="convertFrom"></select><span>→</span><select id="convertTo"></select></div><output id="convertResult">—</output></section>');
-define('passwords','Generatore password','<section class="v6-passwords"><p>Genera password casuali localmente: non vengono inviate in rete né salvate automaticamente.</p><label>Lunghezza <input id="passwordLength" type="range" min="8" max="64" value="20"><output id="passwordLengthValue">20</output></label><div class="v6-tools"><label><input id="passwordUpper" type="checkbox" checked> Maiuscole</label><label><input id="passwordLower" type="checkbox" checked> Minuscole</label><label><input id="passwordNumbers" type="checkbox" checked> Numeri</label><label><input id="passwordSymbols" type="checkbox" checked> Simboli</label></div><output id="passwordResult">Premi Genera password</output><div class="v6-tools"><button id="passwordGenerate">Genera password</button><button id="passwordCopy">Copia</button></div><p id="passwordStatus" class="v6-hint" aria-live="polite"></p></section>');
+define('pomodoro','CoreOS Focus','<section class="v6-pomodoro"><p>Concentrazione, pause e statistiche giornaliere. Il timer usa il tempo reale anche se cambi app.</p><div class="v6-tools"><label>Focus <select id="focusMinutes"><option value="15">15 min</option><option value="25" selected>25 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="60">60 min</option></select></label><label>Pausa <select id="breakMinutes"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option></select></label></div><div id="focusMode">Concentrazione</div><output id="focusClock">25:00</output><div class="v6-tools"><button id="focusStart">Avvia</button><button id="focusPause">Pausa</button><button id="focusReset">Azzera</button><button id="focusSkip">Salta fase</button></div><p id="focusStatus" class="v6-hint">Pronto per iniziare.</p><div class="v6-focus-stats"><strong id="focusSessions">0</strong><span>sessioni completate oggi</span><strong id="focusTotal">0 min</strong><span>tempo di focus oggi</span></div><ol id="focusHistory" class="v6-focus-history"></ol></section>');
+define('converter','Convertitore CoreOS','<section class="v6-converter"><p>Conversioni precise con unità metriche, imperiali e digitali.</p><label>Categoria <select id="convertCategory"><option value="length">Lunghezza</option><option value="area">Superficie</option><option value="volume">Volume</option><option value="weight">Peso</option><option value="temperature">Temperatura</option><option value="speed">Velocità</option><option value="time">Tempo</option><option value="data">Dati digitali</option></select></label><div class="v6-tools"><input id="convertValue" type="number" value="1" step="any" aria-label="Valore"><select id="convertFrom" aria-label="Unità di partenza"></select><span>→</span><select id="convertTo" aria-label="Unità di arrivo"></select></div><output id="convertResult" aria-live="polite">—</output><button type="button" id="convertSwap">Scambia unità</button></section>');
+define('passwords','Generatore password','<section class="v6-passwords"><p>Password create sul dispositivo con casualità crittografica. Non vengono salvate né inviate in rete.</p><label>Lunghezza <input id="passwordLength" type="range" min="8" max="128" value="24"><output id="passwordLengthValue">24</output></label><div class="v6-tools"><label><input id="passwordUpper" type="checkbox" checked> Maiuscole</label><label><input id="passwordLower" type="checkbox" checked> Minuscole</label><label><input id="passwordNumbers" type="checkbox" checked> Numeri</label><label><input id="passwordSymbols" type="checkbox" checked> Simboli</label></div><div class="v6-tools"><label><input id="passwordExclude" type="checkbox" checked> Escludi caratteri ambigui</label><label><input id="passwordReveal" type="checkbox"> Mostra password</label></div><output id="passwordResult">Premi Genera password</output><div class="v6-tools"><button id="passwordGenerate">Genera password</button><button id="passwordCopy">Copia</button></div><div class="v6-password-meter"><span id="passwordStrength"></span></div><p id="passwordStatus" class="v6-hint" aria-live="polite"></p></section>');
 
 function initApp(name){
 if(name==='browser'){const form=$('#v6BrowserForm'),url=$('#v6BrowserUrl'),frame=$('#v6BrowserFrame'),normal=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;url.value=u;frame.src=u};form.onsubmit=e=>{e.preventDefault();normal()};$('#v6BrowserExternal').onclick=()=>{let u=url.value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;openUrl(u)};normal()}
@@ -86,34 +86,56 @@ if(name==='viewer'){
 }
 
 if(name==='pomodoro'){
- let remaining=1500,running=false,interval=null,mode='focus';
- const clock=$('#focusClock'),status=$('#focusStatus'),modeLabel=$('#focusMode'),start=$('#focusStart');
+ const key='coreos.focus.stats.v1',clock=$('#focusClock'),status=$('#focusStatus'),modeLabel=$('#focusMode'),start=$('#focusStart'),sessions=$('#focusSessions'),total=$('#focusTotal'),history=$('#focusHistory');
+ let stats={date:new Date().toLocaleDateString('en-CA'),sessions:0,minutes:0,history:[]};try{stats={...stats,...JSON.parse(localStorage.getItem(key)||'{}')}}catch{}
+ const today=new Date().toLocaleDateString('en-CA');if(stats.date!==today)stats={date:today,sessions:0,minutes:0,history:[]};
+ let mode='focus',remaining=Number($('#focusMinutes').value)*60,running=false,deadline=0,interval=null;
  const fmt=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
- const draw=()=>{clock.textContent=fmt(remaining);document.title=(running?fmt(remaining)+' · ':'')+'CoreOS'};
- const stop=()=>{clearInterval(interval);interval=null;running=false;start.textContent='Avvia';};
- const setMode=m=>{mode=m;remaining=Number($('#'+(m==='focus'?'focusMinutes':'breakMinutes')).value)*60;modeLabel.textContent=m==='focus'?'Concentrazione':'Pausa';status.textContent=m==='focus'?'Tempo di concentrarsi.':'Tempo per una pausa.';draw()};
- start.onclick=()=>{if(running)return;running=true;start.textContent='In corso';interval=setInterval(()=>{remaining--;draw();if(remaining<=0){stop();status.textContent=mode==='focus'?'Sessione completata! Fai una pausa.':'Pausa terminata: pronto a ripartire.';if(mode==='focus')setMode('break');else setMode('focus') }},1000)};
- $('#focusPause').onclick=()=>{stop();status.textContent='Timer in pausa.'};
- $('#focusReset').onclick=()=>{stop();setMode(mode)};
- $('#focusMinutes').onchange=()=>{if(mode==='focus'){stop();setMode('focus')}};
- $('#breakMinutes').onchange=()=>{if(mode==='break'){stop();setMode('break')}};
- setMode('focus');
+ const save=()=>localStorage.setItem(key,JSON.stringify(stats));
+ const paint=()=>{clock.textContent=fmt(remaining);sessions.textContent=stats.sessions;total.textContent=stats.minutes+' min';history.replaceChildren();stats.history.slice(0,8).forEach(x=>{const li=document.createElement('li');li.textContent=x.mode+' · '+x.minutes+' min · '+new Date(x.at).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});history.append(li)});start.textContent=running?'In corso':'Avvia';};
+ const stop=()=>{running=false;clearInterval(interval);interval=null;};
+ const setMode=m=>{stop();mode=m;remaining=Number($('#'+(m==='focus'?'focusMinutes':'breakMinutes')).value)*60;modeLabel.textContent=m==='focus'?'Concentrazione':'Pausa';paint()};
+ const finish=()=>{stop();if(mode==='focus'){stats.sessions++;const minutes=Number($('#focusMinutes').value);stats.minutes+=minutes;stats.history.unshift({mode:'Focus',minutes,at:Date.now()});save();status.textContent='Sessione completata. Ottimo lavoro: è ora di una pausa.';setMode('break')}else{stats.history.unshift({mode:'Pausa',minutes:Number($('#breakMinutes').value),at:Date.now()});stats.history=stats.history.slice(0,20);save();status.textContent='Pausa terminata. Pronto per un nuovo focus?';setMode('focus')}};
+ const tick=()=>{remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));paint();if(remaining<=0)finish()};
+ start.onclick=()=>{if(running)return;running=true;deadline=Date.now()+remaining*1000;status.textContent=mode==='focus'?'Sessione di concentrazione in corso.':'Pausa in corso.';interval=setInterval(tick,250);paint()};
+ $('#focusPause').onclick=()=>{if(running){tick();stop();status.textContent='Timer in pausa.';paint()}};
+ $('#focusReset').onclick=()=>{setMode(mode);status.textContent='Timer azzerato.'};
+ $('#focusSkip').onclick=()=>{setMode(mode==='focus'?'break':'focus');status.textContent='Fase saltata.'};
+ $('#focusMinutes').onchange=()=>{if(mode==='focus'&&!running)setMode('focus')};
+ $('#breakMinutes').onchange=()=>{if(mode==='break'&&!running)setMode('break')};
+ paint();modeLabel.textContent='Concentrazione';
 }
 if(name==='converter'){
- const sets={length:{m:1,km:1000,cm:.01,mm:.001,mi:1609.344,ft:.3048},weight:{kg:1,g:.001,mg:.000001,lb:.45359237,oz:.028349523125},data:{B:1,KB:1000,MB:1e6,GB:1e9,KiB:1024,MiB:1048576,GiB:1073741824}};
- const labels={m:'Metri',km:'Chilometri',cm:'Centimetri',mm:'Millimetri',mi:'Miglia',ft:'Piedi',kg:'Chilogrammi',g:'Grammi',mg:'Milligrammi',lb:'Libbre',oz:'Once',B:'Byte',KB:'KB',MB:'MB',GB:'GB',KiB:'KiB',MiB:'MiB',GiB:'GiB',C:'°C',F:'°F',K:'Kelvin'};
+ const sets={
+ length:{m:1,km:1000,cm:.01,mm:.001,mi:1609.344,ft:.3048,in:.0254},
+ area:{m2:1,km2:1e6,ha:10000,acre:4046.8564224,ft2:.09290304},
+ volume:{L:1,mL:.001,m3:1000,gal:3.785411784,pt:.473176473},
+ weight:{kg:1,g:.001,mg:.000001,lb:.45359237,oz:.028349523125,t:1000},
+ speed:{ms:1,kph:1/3.6,mph:.44704,knot:.514444},
+ time:{s:1,min:60,h:3600,day:86400},
+ data:{B:1,KB:1000,MB:1e6,GB:1e9,TB:1e12,KiB:1024,MiB:1048576,GiB:1073741824,TiB:1099511627776}
+ };
+ const labels={m:'Metri',km:'Chilometri',cm:'Centimetri',mm:'Millimetri',mi:'Miglia',ft:'Piedi',in:'Pollici',m2:'m²',km2:'km²',ha:'Ettari',acre:'Acri',ft2:'ft²',L:'Litri',mL:'Millilitri',m3:'m³',gal:'Galloni US',pt:'Pinte US',kg:'Chilogrammi',g:'Grammi',mg:'Milligrammi',lb:'Libbre',oz:'Once',t:'Tonnellate',ms:'m/s',kph:'km/h',mph:'mph',knot:'Nodi',s:'Secondi',min:'Minuti',h:'Ore',day:'Giorni',B:'Byte',KB:'KB',MB:'MB',GB:'GB',TB:'TB',KiB:'KiB',MiB:'MiB',GiB:'GiB',TiB:'TiB',C:'°C',F:'°F',K:'Kelvin'};
  const cat=$('#convertCategory'),from=$('#convertFrom'),to=$('#convertTo'),value=$('#convertValue'),out=$('#convertResult');
- const populate=()=>{const keys=cat.value==='temperature'?['C','F','K']:Object.keys(sets[cat.value]);from.innerHTML=to.innerHTML='';keys.forEach(k=>{for(const el of [from,to]){const o=document.createElement('option');o.value=k;o.textContent=labels[k];el.append(o)}});if(keys.length>1)to.selectedIndex=1;calculate()};
- const calculate=()=>{const n=Number(value.value);if(!Number.isFinite(n)){out.textContent='Inserisci un valore valido';return}let result;if(cat.value==='temperature'){const c=from.value==='C'?n:from.value==='F'?(n-32)*5/9:n-273.15;result=to.value==='C'?c:to.value==='F'?c*9/5+32:c+273.15}else result=n*sets[cat.value][from.value]/sets[cat.value][to.value];out.textContent=new Intl.NumberFormat('it-IT',{maximumFractionDigits:8}).format(result)+' '+labels[to.value]};
- cat.onchange=populate;[from,to,value].forEach(el=>el.addEventListener('input',calculate));populate();
+ const populate=()=>{const keys=cat.value==='temperature'?['C','F','K']:Object.keys(sets[cat.value]);from.replaceChildren();to.replaceChildren();keys.forEach(k=>{for(const el of [from,to]){const o=document.createElement('option');o.value=k;o.textContent=labels[k];el.append(o)}});if(keys.length>1)to.selectedIndex=1;calculate()};
+ const calculate=()=>{if(value.value.trim()===''){out.textContent='Inserisci un valore';return}const n=Number(value.value);if(!Number.isFinite(n)){out.textContent='Valore non valido';return}let result;if(cat.value==='temperature'){const kelvin=from.value==='C'?n+273.15:from.value==='F'?(n-32)*5/9+273.15:n;if(kelvin<0){out.textContent='La temperatura non può essere inferiore a −273,15 °C';return}result=to.value==='C'?kelvin-273.15:to.value==='F'?(kelvin-273.15)*9/5+32:kelvin}else result=n*sets[cat.value][from.value]/sets[cat.value][to.value];out.textContent=new Intl.NumberFormat('it-IT',{maximumFractionDigits:10}).format(result)+' '+labels[to.value]};
+ cat.onchange=populate;[from,to,value].forEach(el=>el.addEventListener('input',calculate));$('#convertSwap').onclick=()=>{const old=from.value;from.value=to.value;to.value=old;calculate()};populate();
 }
 if(name==='passwords'){
- const length=$('#passwordLength'),lengthOut=$('#passwordLengthValue'),result=$('#passwordResult'),status=$('#passwordStatus');
+ const length=$('#passwordLength'),lengthOut=$('#passwordLengthValue'),result=$('#passwordResult'),status=$('#passwordStatus'),strength=$('#passwordStrength');
+ const generate=()=>{let groups=[];if($('#passwordUpper').checked)groups.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');if($('#passwordLower').checked)groups.push('abcdefghijklmnopqrstuvwxyz');if($('#passwordNumbers').checked)groups.push('0123456789');if($('#passwordSymbols').checked)groups.push('!@#$%^&*()-_=+[]{}?');if(!groups.length){status.textContent='Seleziona almeno un gruppo di caratteri.';return}
+ let chars=groups.join('');if($('#passwordExclude').checked){chars=chars.replace(/[O0Il1]/g,'');groups=groups.map(g=>g.replace(/[O0Il1]/g,''))}
+ const randomIndex=max=>{const limit=Math.floor(0x100000000/max)*max;const buf=new Uint32Array(1);let n;do{crypto.getRandomValues(buf);n=buf[0]}while(n>=limit);return n%max};
+ const pool=Array.from(chars);const output=groups.map(g=>Array.from(g)[randomIndex(Array.from(g).length)]);while(output.length<Number(length.value))output.push(pool[randomIndex(pool.length)]);
+ for(let i=output.length-1;i>0;i--){const j=randomIndex(i+1);[output[i],output[j]]=[output[j],output[i]]}
+ const password=output.join('');result.textContent=password;result.dataset.password=password;const entropy=Number(length.value)*Math.log2(pool.length);strength.style.width=Math.min(100,entropy/100*100)+'%';status.textContent='Entropia stimata: '+Math.round(entropy)+' bit. Generata localmente.';$('#passwordCopy').disabled=false;result.style.userSelect='text';result.textContent=$('#passwordReveal').checked?password:'•'.repeat(password.length);
+ };
  length.oninput=()=>lengthOut.textContent=length.value;
- $('#passwordGenerate').onclick=()=>{let chars='';if($('#passwordUpper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if($('#passwordLower').checked)chars+='abcdefghijklmnopqrstuvwxyz';if($('#passwordNumbers').checked)chars+='0123456789';if($('#passwordSymbols').checked)chars+='!@#$%^&*()-_=+[]{}?';if(!chars){status.textContent='Seleziona almeno un gruppo di caratteri.';return}const bytes=new Uint32Array(Number(length.value));crypto.getRandomValues(bytes);let password='';for(let i=0;i<bytes.length;i++)password+=chars[bytes[i]%chars.length];result.textContent=password;status.textContent='Generata localmente con il generatore crittografico del browser.'};
- $('#passwordCopy').onclick=async()=>{try{await navigator.clipboard.writeText(result.textContent);status.textContent='Password copiata negli appunti.'}catch{status.textContent='Copia non disponibile: seleziona il testo manualmente.'}};
+ $('#passwordReveal').onchange=()=>{const p=result.dataset.password||'';result.textContent=$('#passwordReveal').checked?p:'•'.repeat(p.length)};
+ $('#passwordGenerate').onclick=generate;
+ $('#passwordCopy').onclick=async()=>{const p=result.dataset.password||'';if(!p){status.textContent='Genera prima una password.';return}try{await navigator.clipboard.writeText(p);status.textContent='Password copiata negli appunti.'}catch{status.textContent='Copia non disponibile: seleziona il testo manualmente.'}};
+ $('#passwordCopy').disabled=true;
 }
-
 if(name==='minesweeper'){
  const grid=$('#mineGrid'),status=$('#mineStatus'),size=9,mines=10;let cells=[],ended=false;
  const start=()=>{ended=false;status.textContent='Trova le 10 mine';cells=Array.from({length:size*size},()=>({mine:false,open:false,flag:false,count:0}));let placed=0;while(placed<mines){const i=Math.floor(Math.random()*cells.length);if(!cells[i].mine){cells[i].mine=true;placed++}}cells.forEach((cell,i)=>{if(cell.mine)return;const x=i%size,y=Math.floor(i/size);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&nx<size&&ny>=0&&ny<size&&cells[ny*size+nx].mine)cell.count++}});render()};
@@ -200,6 +222,17 @@ window.openApp=function(name){original(name);initApp(name);addAppPreferences(nam
 
 
 
+
+const newAppsStyle=document.createElement('style');newAppsStyle.textContent=`
+.v6-focus-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);text-align:center}
+.v6-focus-stats strong{font-size:24px}.v6-focus-stats span{font-size:11px;color:var(--muted)}
+.v6-focus-history{font-size:12px;color:var(--muted);padding-left:22px}
+.v6-pomodoro #focusClock{display:block;font-size:clamp(44px,12vw,76px);font-weight:750;letter-spacing:-.05em;text-align:center;font-variant-numeric:tabular-nums;padding:18px}
+.v6-password-meter{height:7px;border-radius:8px;background:var(--panel2);overflow:hidden;margin:12px 0}
+.v6-password-meter span{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+.v6-passwords #passwordResult{display:block;overflow-wrap:anywhere;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);font-family:ui-monospace,monospace;font-size:15px}
+.v6-converter #convertResult{display:block;font-size:24px;font-weight:700;padding:18px 4px;font-variant-numeric:tabular-nums}
+`;document.head.append(newAppsStyle);
 const fileStorageLineStyle=document.createElement('style');fileStorageLineStyle.textContent='.v6-storage-line{display:flex;align-items:center;justify-content:space-between;gap:8px}.v6-storage-line button{font-size:10px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text)}';document.head.append(fileStorageLineStyle);
 const fileManagerStyle=document.createElement('style');fileManagerStyle.textContent=`
 .v6-file-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;margin:12px 0}
