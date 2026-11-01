@@ -81,3 +81,41 @@
  #accountGate .gate-card,#accountGate .gate-mark{animation:none!important}
  #accountGate *{scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+/* CoreOS refined panels — mobile-first, native visual language */
+.window-layer.has-window .app-window{scrollbar-width:thin;scrollbar-color:var(--core-muted) transparent}
+.app-window{overscroll-behavior:contain}
+.window-head{flex:0 0 52px;backdrop-filter:blur(18px)}
+.window-body{min-width:0;overscroll-behavior:contain;scrollbar-width:thin}
+.window-body>*{min-width:0}
+.v6-settings,.core-v6-settings{padding:18px;margin:18px 0 0;border:1px solid var(--core-border);border-radius:18px;background:linear-gradient(145deg,var(--core-surface-2),var(--core-surface));box-shadow:0 10px 28px #00000012}
+.v6-settings h3,.core-v6-settings h3{margin:2px 0 10px;font-size:17px;letter-spacing:-.02em}
+.v6-settings>p,.core-v6-settings>p{font-size:12px;line-height:1.6;color:var(--core-muted)}
+.v6-settings>label,.core-setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:52px;padding:11px 0;border-bottom:1px solid var(--core-border);font-size:13px}
+.v6-settings>label:last-of-type,.core-setting-row:last-of-type{border-bottom:0}
+.v6-settings select,.core-setting-row select{max-width:52%;min-width:130px;min-height:40px;padding:8px 11px;border:1px solid var(--core-border);border-radius:11px;background:var(--core-surface);color:var(--core-ink);font:inherit}
+.v6-settings button,.core-setting-row button{min-height:42px;padding:10px 14px;border:1px solid var(--core-border);border-radius:12px;background:var(--blue,#b5ccf5);color:#142033;font-weight:750}
+.v6-settings .v6-upload{display:flex;align-items:center;justify-content:center;width:100%;max-width:none;min-height:44px;margin:8px 0;border:1px dashed var(--core-border);border-radius:12px;background:var(--core-surface-2);color:var(--core-ink)}
+.v6-app-preferences{border-radius:16px!important;padding:14px!important}
+.v6-app-preferences summary{font-size:14px;padding:8px 2px}
+.v6-pref-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))!important;gap:9px!important}
+.v6-pref-row{min-height:48px;border-radius:12px!important;padding:10px 12px!important}
+.v6-pomodoro,.v6-converter,.v6-passwords{display:grid;gap:14px;padding:4px 0}
+.v6-pomodoro #focusMode{text-align:center;font-size:13px;color:var(--core-muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.v6-pomodoro #focusClock{display:block;text-align:center;font:750 clamp(48px,13vw,76px)/1.1 ui-monospace,monospace;letter-spacing:-.06em;padding:20px 0;color:var(--core-ink)}
+.v6-pomodoro .v6-tools{justify-content:center}
+.v6-pomodoro .v6-tools button,.v6-converter .v6-tools button,.v6-passwords .v6-tools button{min-height:42px;border-radius:12px}
+.v6-converter>label,.v6-passwords>label{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.v6-converter select,.v6-passwords input[type=range]{max-width:60%}
+.v6-converter output,.v6-passwords>output{display:block;padding:16px;border:1px solid var(--core-border);border-radius:14px;background:var(--core-surface-2);font-size:20px;font-weight:750;overflow-wrap:anywhere}
+.v6-passwords .v6-tools label{display:flex;align-items:center;gap:6px;font-size:12px}
+@media(max-width:700px){
+ .window-layer.has-window .app-window{position:fixed!important;left:9px!important;right:9px!important;top:calc(env(safe-area-inset-top,0px) + 8px)!important;bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;width:auto!important;height:auto!important;max-height:none!important;min-height:0!important;transform:none!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border-radius:21px!important}
+ .window-layer.has-window .window-head{height:54px;flex-basis:54px;padding:0 15px}
+ .window-layer.has-window .window-body{flex:1 1 auto;min-height:0;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;padding:16px!important}
+ .v6-settings,.core-v6-settings{padding:14px;margin:14px 0 0;border-radius:15px}
+ .v6-settings>label,.core-setting-row{align-items:center;min-height:56px;font-size:12px}
+ .v6-settings select,.core-setting-row select{min-width:118px;max-width:56%;font-size:12px}
+ .core-app-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){.app-window,.app-window *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
