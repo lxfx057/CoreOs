@@ -50,7 +50,7 @@
   if(!launcher)return;
   const search=$('#launcherSearch'),buttons=appLabels(),categories=[...launcher.querySelectorAll('[data-category]')];
   const categoryFor=id=>({
-   files:'system',terminal:'system',monitor:'system',settings:'system',apps:'system',store:'system',
+   files:'system',terminal:'system',settings:'system',apps:'system',store:'system',
    browser:'internet',weather:'internet',
    notes:'office',calendar:'office',tasks:'office',
    paint:'creative',media:'creative',viewer:'creative',
