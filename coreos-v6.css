@@ -149,3 +149,11 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* Respect CoreOS' own motion preference as well as the OS accessibility setting */
+:where(button,a,input,select,textarea,[role="button"]) {
+  transition-duration: calc(180ms * var(--motion, 1));
+}
+:where(.card,.panel,.setting-card,.entry,.rom-card,.template-card,.glass-panel,.welcome-panel) {
+  animation-duration: calc(360ms * var(--motion, 1));
+}
