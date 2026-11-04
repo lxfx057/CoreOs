@@ -399,8 +399,9 @@ if(cursor&&matchMedia('(hover:hover) and (pointer:fine)').matches){
     const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
     input.onchange=async()=>{
       const f=input.files?.[0];if(!f)return;
-      try{const p=JSON.parse(await f.text());if(p.format!=='coreos-clone'||!p.config)throw new Error('Formato non valido');
-        config={...defaults,...p.config};localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
+      try{if(f.size>1024*1024)throw new Error('File troppo grande (massimo 1 MB)');const p=JSON.parse(await f.text());if(!p||p.format!=='coreos-clone'||!p.config||typeof p.config!=='object'||Array.isArray(p.config))throw new Error('Formato non valido');
+        const safeConfig=Object.fromEntries(Object.entries(p.config).filter(([key])=>Object.prototype.hasOwnProperty.call(defaults,key)));
+        config={...defaults,...safeConfig};localStorage.setItem(CONFIG_KEY,JSON.stringify(config));
         if(localStorage.getItem(PROFILE_KEY)){applyConfig();alert('Configurazione clonata e applicata al profilo esistente.');location.reload();}
         else{showCreate();alert('Configurazione importata. Crea username e password per completare il nuovo CoreOS.');}
       }catch(e){alert('Impossibile importare il file: '+e.message);}
